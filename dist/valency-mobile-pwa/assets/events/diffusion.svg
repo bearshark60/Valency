@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071929"/>
+      <stop offset="100%" stop-color="#1e0b26"/>
+    </linearGradient>
+    <radialGradient id="cyanPlume" cx="34%" cy="46%" r="52%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="magPlume" cx="68%" cy="54%" r="52%">
+      <stop offset="0%" stop-color="#f472b6" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#db2777" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <rect width="240" height="160" fill="url(#cyanPlume)"/>
+  <rect width="240" height="160" fill="url(#magPlume)"/>
+  <!-- Swirling intermingling entropy tendrils -->
+  <g fill="none" stroke-linecap="round" filter="url(#soft)" opacity="0.85">
+    <path d="M18 118 C64 42, 114 134, 168 48 C186 24, 210 38, 226 62" stroke="#22d3ee" stroke-width="14"/>
+    <path d="M222 44 C172 124, 122 32, 72 118 C52 142, 28 128, 14 102" stroke="#f472b6" stroke-width="14"/>
+  </g>
+  <!-- Crisp luminous core currents -->
+  <path d="M24 114 C68 44, 114 130, 168 50" fill="none" stroke="#a5f3fc" stroke-width="3" opacity="0.9"/>
+  <path d="M216 48 C170 120, 124 34, 72 114" fill="none" stroke="#fbcfe8" stroke-width="3" opacity="0.9"/>
+  <!-- Drifting diffusing molecules -->
+  <g>
+    <circle cx="64" cy="54" r="4" fill="#67e8f9"/>
+    <circle cx="102" cy="76" r="3.5" fill="#f9a8d4"/>
+    <circle cx="136" cy="84" r="4" fill="#67e8f9"/>
+    <circle cx="176" cy="108" r="4" fill="#f9a8d4"/>
+    <circle cx="122" cy="44" r="3" fill="#ffffff" opacity="0.85"/>
+    <circle cx="116" cy="120" r="3" fill="#ffffff" opacity="0.85"/>
+  </g>
+</svg>

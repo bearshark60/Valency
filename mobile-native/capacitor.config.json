@@ -1,0 +1,14 @@
+{
+  "appId": "com.valency.cardgame",
+  "appName": "VALENCY",
+  "webDir": "../dist/valency-mobile-pwa",
+  "bundledWebRuntime": false,
+  "ios": {
+    "contentInset": "automatic",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}

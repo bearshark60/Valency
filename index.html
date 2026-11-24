@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VALENCY — Chemistry Card Game</title>
+  <link rel="stylesheet" href="src/styles/main.css" />
+</head>
+<body>
+  <!-- ===== HOME MENU SCREEN ===== -->
+  <div id="menu-screen" class="menu-screen">
+    <div class="menu-card">
+      <div class="menu-hero">
+        <div id="menu-atom-logo" class="menu-atom-logo" aria-hidden="true"></div>
+        <h1 class="menu-title">VALENCY</h1>
+        <p class="menu-tagline">Combine real elements, defend with Noble Gases, and steal bonds via Electronegativity. First to <strong>25 SP</strong> wins.</p>
+        <button id="menu-audio-prompt" class="menu-audio-prompt hidden" type="button">🎵 Click anywhere to start menu music</button>
+      </div>
+
+      <div class="menu-primary-actions">
+        <button id="menu-btn-story" class="menu-cta menu-cta-story">
+          <span class="menu-cta-icon">📖</span>
+          <span class="menu-cta-text">
+            <strong>Story Mode: Academy Licensure</strong>
+            <small>Chapter 0 • Historical Scientist Simulations &amp; Research Archive</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-ai" class="menu-cta menu-cta-primary">
+          <span class="menu-cta-icon">⚛</span>
+          <span class="menu-cta-text">
+            <strong>Classic Match vs. Dr. Mendeleev (AI)</strong>
+            <small>Solo match • 120-card Unit 1 deck</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-pvp" class="menu-cta menu-cta-secondary">
+          <span class="menu-cta-icon">🧪</span>
+          <span class="menu-cta-text">
+            <strong>2-Player Pass &amp; Play</strong>
+            <small>Local head-to-head with hidden hand handoff</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-tutorial" class="menu-cta menu-cta-tutorial">
+          <span class="menu-cta-icon">🎓</span>
+          <span class="menu-cta-text">
+            <strong>Interactive Tutorial</strong>
+            <small>7 guided hands-on lessons covering every mechanic</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="menu-utility-row">
+        <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
+        <button id="menu-btn-gallery" class="ctrl-btn">Event Art (18)</button>
+        <button id="menu-btn-rules" class="ctrl-btn">Quick Rules</button>
+        <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
+        <button id="menu-btn-pick-music" class="ctrl-btn" title="Test any local audio file immediately">📁 Pick Track</button>
+        <input id="menu-music-file" type="file" accept="audio/*" class="hidden" />
+        <button id="menu-btn-sfx" class="ctrl-btn">🔊 SFX: On</button>
+        <button id="menu-btn-fx" class="ctrl-btn">✨ FX: On</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Music Elements per Mode (drop custom files into assets/audio/; synth soundtrack plays automatically if no custom file exists) -->
+  <audio id="bgm-menu" loop preload="auto">
+    <source src="assets/audio/menu-theme.wav" type="audio/wav" />
+    <source src="assets/audio/menu-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/menu-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/menu-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-vs_ai" loop preload="auto">
+    <source src="assets/audio/ai-battle-theme.wav" type="audio/wav" />
+    <source src="assets/audio/ai-battle-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/ai-battle-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/ai-battle-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-pass_and_play" loop preload="none">
+    <source src="assets/audio/pvp-theme.wav" type="audio/wav" />
+    <source src="assets/audio/pvp-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/pvp-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/pvp-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-tutorial" loop preload="auto">
+    <source src="assets/audio/tutorial-theme.wav" type="audio/wav" />
+    <source src="assets/audio/tutorial-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/tutorial-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/tutorial-theme.m4a" type="audio/mp4" />
+  </audio>
+  <!-- Per-Scientist Story Mode Themes (drop custom files into assets/audio/; unique synthesized themes play automatically if no custom file exists) -->
+  <audio id="bgm-scientist-lavoisier" loop preload="none">
+    <source src="assets/audio/lavoisier-theme.wav" type="audio/wav" />
+    <source src="assets/audio/lavoisier-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/lavoisier-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/lavoisier-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-scientist-mendeleev" loop preload="none">
+    <source src="assets/audio/mendeleev-theme.wav" type="audio/wav" />
+    <source src="assets/audio/mendeleev-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/mendeleev-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/mendeleev-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-scientist-pauling" loop preload="none">
+    <source src="assets/audio/pauling-theme.wav" type="audio/wav" />
+    <source src="assets/audio/pauling-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/pauling-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/pauling-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-scientist-curie" loop preload="none">
+    <source src="assets/audio/curie-theme.wav" type="audio/wav" />
+    <source src="assets/audio/curie-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/curie-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/curie-theme.m4a" type="audio/mp4" />
+  </audio>
+  <audio id="bgm-scientist-proctor" loop preload="none">
+    <source src="assets/audio/final-exam-theme.wav" type="audio/wav" />
+    <source src="assets/audio/final-exam-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/final-exam-theme.ogg" type="audio/ogg" />
+    <source src="assets/audio/final-exam-theme.m4a" type="audio/mp4" />
+  </audio>
+
+  <!-- ===== ACTIVE MATCH INTERFACE (Hidden until match/tutorial starts) ===== -->
+  <div id="app" class="app-shell hidden">
+    <!-- Streamlined Top Header Bar -->
+    <header class="topbar">
+      <div class="brand">
+        <button id="btn-back-menu" class="ctrl-btn" title="Return to Main Menu">← Menu</button>
+        <span class="brand-title">VALENCY</span>
+      </div>
+
+      <div id="turn-banner" class="turn-banner">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="topbar-actions">
+        <button id="btn-periodic" class="ctrl-btn" title="Open Periodic Table reference">Periodic Table</button>
+        <button id="btn-rules" class="ctrl-btn" title="Open Quick Rules">Rules</button>
+        <button id="btn-music-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Background Music">🎵</button>
+        <button id="btn-sfx-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Sound Effects">🔊</button>
+        <button id="btn-fx-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Visual Animations">✨</button>
+        <button id="btn-sidebar-toggle" class="ctrl-btn" title="Toggle Hints & Log panel">Panel ▸</button>
+        <button id="btn-concede" class="ctrl-btn ctrl-icon-btn" title="Concede / Abort Experiment (Fail State)">🏳</button>
+        <button id="btn-new-game" class="ctrl-btn ctrl-btn-primary" title="Restart current match">↻ Restart</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace: Wide Table + Compact Tabbed Side Panel -->
+    <div id="main-layout" class="main-layout">
+      <main class="table-area">
+        <!-- Interactive Tutorial Coach Banner (hidden during normal play) -->
+        <section id="tutorial-banner" class="tutorial-banner hidden"></section>
+
+        <!-- Opponent Zone -->
+        <section id="opponent-zone" class="player-zone opponent-zone"></section>
+
+        <!-- Center Bench: Deck, Discard, Action & Synthesis Bar -->
+        <section id="center-bench" class="center-bench"></section>
+
+        <!-- Active / Bottom Player Zone -->
+        <section id="player-zone" class="player-zone bottom-zone"></section>
+      </main>
+
+      <!-- Streamlined Tabbed Sidebar: Hints OR Log -->
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-panel sidebar-tabbed">
+          <div class="sidebar-tabs">
+            <button id="tab-hints" class="sidebar-tab active">
+              💡 Hints <span id="recipe-count" class="pill-count">0</span>
+            </button>
+            <button id="tab-log" class="sidebar-tab">
+              📜 Log
+            </button>
+          </div>
+
+          <div id="pane-hints" class="tab-pane">
+            <div id="recipe-hints" class="recipe-hints"></div>
+          </div>
+
+          <div id="pane-log" class="tab-pane hidden">
+            <div id="reaction-log" class="reaction-log"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Non-blocking Reaction & Atomic FX Layer -->
+  <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+
+  <!-- Pre-Match Chemist Profile VS Intro Overlay -->
+  <div id="intro-root" class="intro-backdrop hidden"></div>
+
+  <!-- 2-Second Opponent Card Play Showcase Overlay -->
+  <div id="showcase-root" class="showcase-backdrop hidden"></div>
+
+  <!-- Modal Backdrop (Periodic Table, Rules, Event Gallery, Prompts, EN Takeover Choice, Discard Inspector, Victory) -->
+  <div id="modal-root" class="modal-backdrop hidden"></div>
+
+  <!-- Pass & Play Curtain -->
+  <div id="curtain-root" class="curtain-backdrop hidden"></div>
+
+  <!-- Core Scripts (Zero-build, works over file:// and HTTP) -->
+  <script src="src/data/cards.js"></script>
+  <script src="src/data/compounds.js"></script>
+  <script src="src/engine/gameEngine.js"></script>
+  <!-- Story Mode & Historical Scientist Architecture (Modular, Zero Engine Duplication) -->
+  <script src="src/story/scientists.js"></script>
+  <script src="src/story/scientistCardSchema.js"></script>
+  <script src="src/story/opponentConfigs.js"></script>
+  <script src="src/story/evaluation.js"></script>
+  <script src="src/story/researchChallenges.js"></script>
+  <script src="src/story/progression.js"></script>
+  <script src="src/story/academyChapter.js"></script>
+  <!-- Configurable AI & UI Controllers -->
+  <script src="src/engine/ai.js"></script>
+  <script src="src/ui/sound.js"></script>
+  <script src="src/ui/animations.js"></script>
+  <script src="src/ui/tutorial.js"></script>
+  <script src="src/ui/storyUI.js"></script>
+  <script src="src/ui/app.js"></script>
+</body>
+</html>

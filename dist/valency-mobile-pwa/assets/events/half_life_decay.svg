@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12180c"/>
+      <stop offset="55%" stop-color="#1c112b"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <radialGradient id="radGlow" cx="38%" cy="52%" r="48%">
+      <stop offset="0%" stop-color="#a3e635" stop-opacity="0.72"/>
+      <stop offset="55%" stop-color="#a855f7" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <circle cx="92" cy="84" r="74" fill="url(#radGlow)"/>
+  <!-- Exponential half-life decay curve across background -->
+  <path d="M26 26 Q56 96 118 118 T222 138" fill="none" stroke="#c084fc" stroke-width="3" opacity="0.75"/>
+  <path d="M26 26 Q56 96 118 118 T222 138" fill="none" stroke="#f5d0fe" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <!-- Splitting unstable nucleus -->
+  <path d="M90 50 A34 34 0 1 0 90 118 Z" fill="#65a30d" stroke="#d9f99d" stroke-width="2.2"/>
+  <path d="M100 50 A34 34 0 1 1 100 118 Z" fill="#7e22ce" stroke="#e9d5ff" stroke-width="2.2" opacity="0.88"/>
+  <!-- Radiating decay wave arcs -->
+  <g fill="none" stroke="#bef264" stroke-width="2" stroke-linecap="round" opacity="0.8">
+    <path d="M144 58 A36 36 0 0 1 144 108"/>
+    <path d="M162 46 A52 52 0 0 1 162 120" opacity="0.55"/>
+    <path d="M180 34 A68 68 0 0 1 180 132" opacity="0.35"/>
+  </g>
+  <!-- Emitted alpha/beta particles -->
+  <g fill="#d9f99d">
+    <circle cx="152" cy="70" r="3.5"/>
+    <circle cx="174" cy="84" r="4"/>
+    <circle cx="158" cy="102" r="3"/>
+    <circle cx="198" cy="64" r="2.8"/>
+  </g>
+</svg>
