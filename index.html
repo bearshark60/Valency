@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VALENCY — Chemistry Card Game</title>
   <link rel="stylesheet" href="src/styles/main.css" />
+  <link rel="stylesheet" href="src/styles/frontier.css" />
 </head>
 <body>
   <!-- ===== HOME MENU SCREEN ===== -->
@@ -23,6 +24,15 @@
           <span class="menu-cta-text">
             <strong>Story Mode: Academy Licensure</strong>
             <small>Chapter 0 • Historical Scientist Simulations &amp; Research Archive</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-frontier" class="menu-cta menu-cta-frontier">
+          <span class="menu-cta-icon">🧭</span>
+          <span class="menu-cta-text">
+            <strong>Frontier Overworld (Prototype)</strong>
+            <small>Chapter 1 Field Lab • 8-Way Top-Down Exploration</small>
           </span>
           <span class="menu-cta-arrow">→</span>
         </button>
@@ -190,6 +200,9 @@
     </div>
   </div>
 
+  <!-- Independent Frontier Overworld Layer (Hidden until Frontier Mode is entered) -->
+  <div id="frontier-screen" class="frontier-screen hidden" aria-label="Valency Frontier Overworld"></div>
+
   <!-- Non-blocking Reaction & Atomic FX Layer -->
   <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
 
@@ -224,5 +237,14 @@
   <script src="src/ui/tutorial.js"></script>
   <script src="src/ui/storyUI.js"></script>
   <script src="src/ui/app.js"></script>
+  <!-- Independent Frontier Overworld Layer (Decoupled from Card Engine & Rendering) -->
+  <script src="src/frontier/world.js"></script>
+  <script src="src/frontier/player.js"></script>
+  <script src="src/frontier/movement.js"></script>
+  <script src="src/frontier/camera.js"></script>
+  <script src="src/frontier/inputKeyboard.js"></script>
+  <script src="src/frontier/inputJoystick.js"></script>
+  <script src="src/frontier/topDownRenderer.js"></script>
+  <script src="src/frontier/frontier.js"></script>
 </body>
 </html>

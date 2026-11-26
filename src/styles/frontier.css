@@ -1,0 +1,301 @@
+/* VALENCY: The Elemental Frontier — Independent Overworld Stylesheet
+ * Scoped strictly to Frontier menu CTA and #frontier-screen so existing card battle & Story UI stay untouched.
+ */
+
+/* ===== MENU ENTRY CTA ===== */
+.menu-cta-frontier {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(14, 116, 144, 0.34), rgba(15, 23, 42, 0.96));
+  border-color: rgba(52, 211, 153, 0.62);
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.16);
+}
+
+.menu-cta-frontier:hover {
+  border-color: #5eead4;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.36), rgba(14, 116, 144, 0.45), rgba(15, 23, 42, 0.96));
+  box-shadow: 0 14px 30px rgba(45, 212, 191, 0.28);
+}
+
+/* Lock page scroll cleanly while Frontier overworld is open */
+body.frontier-active {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* ===== FULL-SCREEN FRONTIER OVERWORLD SHELL ===== */
+.frontier-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #070d18;
+  color: #f1f5f9;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.frontier-screen.hidden {
+  display: none;
+}
+
+/* Top HUD Bar */
+.frontier-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding:
+    max(8px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    8px
+    max(12px, env(safe-area-inset-left));
+  background: rgba(11, 18, 32, 0.94);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.28);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.frontier-top-left,
+.frontier-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.frontier-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.frontier-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #5eead4;
+  white-space: nowrap;
+}
+
+.frontier-zone-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.frontier-exit-btn,
+.frontier-ctrl-btn {
+  min-height: 34px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Canvas Viewport Wrapper */
+.frontier-canvas-wrap {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.frontier-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* Compact Telemetry Chip (Bottom-Right) */
+.frontier-hud-telemetry {
+  position: absolute;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.84);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  color: #cbd5e1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 4;
+  backdrop-filter: blur(4px);
+}
+
+.frontier-hud-sep {
+  color: rgba(148, 163, 184, 0.45);
+}
+
+/* Desktop Controls Hint (Bottom-Center) */
+.frontier-controls-hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ===== DECOUPLED MOBILE VIRTUAL JOYSTICK ===== */
+.frontier-joystick-zone {
+  position: absolute;
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 6;
+  touch-action: none;
+}
+
+.frontier-joystick-zone.hidden {
+  display: none;
+}
+
+.frontier-joystick-base {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.48) 100%);
+  border: 2px solid rgba(56, 189, 248, 0.48);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5), inset 0 0 18px rgba(56, 189, 248, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: grab;
+}
+
+.frontier-joystick-base.is-active {
+  border-color: #5eead4;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), inset 0 0 22px rgba(45, 212, 191, 0.28);
+  cursor: grabbing;
+}
+
+.frontier-joy-dir {
+  position: absolute;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.55);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.frontier-joy-n { top: 8px; left: 50%; transform: translateX(-50%); }
+.frontier-joy-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
+.frontier-joy-w { left: 8px; top: 50%; transform: translateY(-50%); }
+.frontier-joy-e { right: 8px; top: 50%; transform: translateY(-50%); }
+
+.frontier-joystick-knob {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #7dd3fc, #0284c7 65%, #0369a1);
+  border: 2px solid rgba(224, 242, 254, 0.85);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.55);
+  pointer-events: none;
+  will-change: transform;
+  transition: box-shadow 0.12s ease;
+}
+
+.frontier-joystick-base.is-active .frontier-joystick-knob {
+  background: radial-gradient(circle at 35% 30%, #99f6e4, #0d9488 65%, #115e59);
+  box-shadow: 0 0 18px rgba(94, 234, 212, 0.72);
+}
+
+/* ===== MOBILE RESPONSIVE BREAKPOINTS (390x844 & 320x568 SAFE) ===== */
+@media (max-width: 720px) {
+  .frontier-zone-sub,
+  .frontier-controls-hint {
+    display: none;
+  }
+
+  .frontier-topbar {
+    padding:
+      max(7px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      7px
+      max(10px, env(safe-area-inset-left));
+    gap: 6px;
+  }
+
+  .frontier-title {
+    font-size: 13.5px;
+    letter-spacing: 0.08em;
+  }
+
+  .frontier-exit-btn,
+  .frontier-ctrl-btn {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Ultra-compact layout for 320x568 screens: zero overflow, zero HUD/joystick overlap */
+  .frontier-title-group {
+    display: none;
+  }
+
+  .frontier-joystick-zone {
+    left: max(12px, env(safe-area-inset-left));
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .frontier-joystick-base {
+    width: 94px;
+    height: 94px;
+  }
+
+  .frontier-joystick-knob {
+    width: 38px;
+    height: 38px;
+  }
+
+  .frontier-hud-telemetry {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    padding: 5px 8px;
+    font-size: 10.5px;
+    gap: 4px;
+  }
+
+  /* Keep Menu CTA compact on 320px viewports too */
+  .menu-card {
+    padding: 18px 14px 16px;
+    gap: 14px;
+  }
+
+  .menu-cta {
+    padding: 11px 12px;
+    gap: 10px;
+  }
+
+  .menu-cta-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 19px;
+  }
+}
