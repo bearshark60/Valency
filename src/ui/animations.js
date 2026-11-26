@@ -41,6 +41,9 @@
     if (V.CharacterRig && typeof V.CharacterRig.syncAllRigsMode === 'function') {
       V.CharacterRig.syncAllRigsMode();
     }
+    if (V.BattleFormation && typeof V.BattleFormation.syncReducedMotion === 'function') {
+      V.BattleFormation.syncReducedMotion();
+    }
   }
 
   function isAnimationsEnabled() {
@@ -602,6 +605,10 @@
    * Render a mini animated bonded molecule SVG on an active field compound tile.
    */
   function renderMoleculeClusterSVG(comp) {
+    if (V.BattleFormation && typeof V.BattleFormation.renderFieldClusterSVG === 'function') {
+      const chemSvg = V.BattleFormation.renderFieldClusterSVG(comp);
+      if (chemSvg) return chemSvg;
+    }
     const elems = comp.elements || [];
     if (elems.length === 0) return '';
 
@@ -706,25 +713,33 @@
       if (!meta || !meta.type || meta.type === 'CARDS_DRAWN') continue;
 
       switch (meta.type) {
-        case 'SYNTHESIZE':
-          spawnBanner(layer, `⚛ SYNTHESIZED ${meta.formula}`, `+${meta.sp} SP`, 'fx-synth');
+        case 'SYNTHESIZE': {
+          const handled = V.BattleFormation && V.BattleFormation.presentFromEvent(meta, { viewingPlayerIndex });
+          if (!handled) {
+            spawnBanner(layer, `⚛ SYNTHESIZED ${meta.formula}`, `+${meta.sp} SP`, 'fx-synth');
+          }
           pulseCompoundTile(meta.compoundId, 'fx-tile-synth', `+${meta.sp} SP`);
           break;
+        }
 
         case 'SHIELD':
           spawnBanner(layer, `🛡 ${meta.shield} INERT SHIELD`, 'Protected!', 'fx-shield');
           pulseCompoundTile(meta.compoundId, 'fx-tile-shield', `🛡 ${meta.shield}`);
           break;
 
-        case 'EN_TAKEOVER':
-          spawnBanner(
-            layer,
-            `⚡ EN TAKEOVER: ${meta.attackSymbol} → ${meta.newFormula}`,
-            `Displaced ${meta.oldFormula}!`,
-            'fx-takeover'
-          );
+        case 'EN_TAKEOVER': {
+          const handled = V.BattleFormation && V.BattleFormation.presentFromEvent(meta, { viewingPlayerIndex });
+          if (!handled) {
+            spawnBanner(
+              layer,
+              `⚡ EN TAKEOVER: ${meta.attackSymbol} → ${meta.newFormula}`,
+              `Displaced ${meta.oldFormula}!`,
+              'fx-takeover'
+            );
+          }
           spawnLightningBurst(layer);
           break;
+        }
 
         case 'ACID_RAIN':
           spawnBanner(layer, `☣ ACID RAIN`, `${meta.formula} dissolved (-${meta.lostSP} SP)`, 'fx-acid');
@@ -830,10 +845,14 @@
           pulseCompoundTile(meta.compoundId, 'fx-tile-shatter', 'UNSTABLE');
           break;
 
-        case 'STABILIZE_COMPOUND':
-          spawnBanner(layer, `⚛ STABILIZED ${meta.formula}!`, `Locked in for +${meta.sp} SP!`, 'fx-synth');
+        case 'STABILIZE_COMPOUND': {
+          const handled = V.BattleFormation && V.BattleFormation.presentFromEvent(meta, { viewingPlayerIndex });
+          if (!handled) {
+            spawnBanner(layer, `⚛ STABILIZED ${meta.formula}!`, `Locked in for +${meta.sp} SP!`, 'fx-synth');
+          }
           pulseCompoundTile(meta.compoundId, 'fx-tile-synth', `+${meta.sp} SP`);
           break;
+        }
 
         case 'UNSTABLE_DECAY':
           spawnBanner(layer, `💥 UNSTABLE COLLAPSE!`, `${meta.formula} was not stabilized — discarded!`, 'fx-red');

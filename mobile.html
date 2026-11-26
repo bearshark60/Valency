@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="src/styles/theme-tokens.css" />
   <link rel="stylesheet" href="src/styles/main.css" />
   <link rel="stylesheet" href="src/styles/character-portrait.css" />
+  <link rel="stylesheet" href="src/styles/molecular-formation.css" />
   <link rel="stylesheet" href="src/styles/mobile.css" />
 </head>
 <body class="valency-mobile">
@@ -84,6 +85,7 @@
         <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
         <button id="menu-btn-gallery" class="ctrl-btn">Event Art</button>
         <button id="menu-btn-char-studio" class="ctrl-btn">🎭 Character Animation Studio</button>
+        <button id="menu-btn-formation-lab" class="ctrl-btn">⚛ Formation Lab</button>
         <button id="menu-btn-rules" class="ctrl-btn">Rules</button>
         <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
         <button id="menu-btn-sfx" class="ctrl-btn">🔊 SFX: On</button>
@@ -262,6 +264,7 @@
   <!-- Shared Canonical Rules Engine, Story Mode, AI, and UI + Mobile Touch Shell -->
   <script src="src/data/cards.js"></script>
   <script src="src/data/compounds.js"></script>
+  <script src="src/data/chemicalIdentity.js"></script>
   <script src="src/engine/gameEngine.js"></script>
   <script src="src/story/scientists.js"></script>
   <script src="src/story/scientistCardSchema.js"></script>
@@ -283,6 +286,8 @@
   <script src="src/presentation/characterSvgRegistry.js"></script>
   <script src="src/presentation/characterRigEngine.js"></script>
   <script src="src/presentation/characterRegistry.js"></script>
+  <script src="src/presentation/formationChoreography.js"></script>
+  <script src="src/presentation/battleFormationBridge.js"></script>
   <script src="src/engine/ai.js"></script>
   <script src="src/ui/sound.js"></script>
   <script src="src/ui/animations.js"></script>
