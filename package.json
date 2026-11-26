@@ -1,0 +1,18 @@
+{
+  "name": "valency-card-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VALENCY — Playable Chemistry Card Game Prototype & Automated Test Suite",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/run-all.js",
+    "test:unit": "node tests/run-all.js",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:all": "node tests/run-all.js --e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0"
+  }
+}

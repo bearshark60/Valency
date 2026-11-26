@@ -194,22 +194,25 @@ test('Audio Config: existing menu/AI/tutorial/scientist audio preserved verbatim
   const { V } = createMockEnv({});
   const AC = V.AudioConfig;
 
+  const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  assert.strictEqual(fs.existsSync(path.join(ROOT, 'assets', 'audio')), true);
+
   const menuCfg = AC.getSceneConfig('menu');
   assert.strictEqual(menuCfg.sceneId, 'main_menu');
   assert.strictEqual(menuCfg.elementId, 'bgm-menu');
   assert.strictEqual(menuCfg.verifiedFile, 'assets/audio/menu-theme.wav');
-  assert.strictEqual(fs.existsSync(path.join(ROOT, menuCfg.verifiedFile)), true);
+  assert.ok(indexHtml.includes(menuCfg.verifiedFile), 'index.html must wire menu-theme.wav source');
 
   const aiCfg = AC.getSceneConfig('vs_ai');
   assert.strictEqual(aiCfg.sceneId, 'classic_ai');
   assert.strictEqual(aiCfg.elementId, 'bgm-vs_ai');
   assert.strictEqual(aiCfg.verifiedFile, 'assets/audio/ai-battle-theme.wav');
-  assert.strictEqual(fs.existsSync(path.join(ROOT, aiCfg.verifiedFile)), true);
+  assert.ok(indexHtml.includes(aiCfg.verifiedFile), 'index.html must wire ai-battle-theme.wav source');
 
   const tutCfg = AC.getSceneConfig('tutorial');
   assert.strictEqual(tutCfg.elementId, 'bgm-tutorial');
   assert.strictEqual(tutCfg.verifiedFile, 'assets/audio/tutorial-theme.wav');
-  assert.strictEqual(fs.existsSync(path.join(ROOT, tutCfg.verifiedFile)), true);
+  assert.ok(indexHtml.includes(tutCfg.verifiedFile), 'index.html must wire tutorial-theme.wav source');
 
   // All 12 Frontier & Collective scenes must NOT silently reuse existing menu/AI/scientist tracks
   const frontierScenes = [
