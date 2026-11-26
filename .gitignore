@@ -19,6 +19,11 @@ mobile-native/android/
 # Local AI review packet exports (ephemeral)
 .ai-packets/
 
+# Playwright test artifacts & reports
+playwright-report/
+test-results/
+blob-report/
+
 # Secrets & environment files
 .env
 .env.local

@@ -177,7 +177,12 @@ async function runAsyncTests() {
       const relSvgKey = `assets/characters/${id}/master_layered.svg`;
       assert(V.CHARACTER_SVG_SOURCES[relSvgKey], `${id}: missing from characterSvgRegistry.js`);
       const svgText = fs.readFileSync(svgPath, 'utf8');
-      assert.strictEqual(V.CHARACTER_SVG_SOURCES[relSvgKey], svgText, `${id}: characterSvgRegistry.js out of sync with disk`);
+      const normalizeEol = (s) => String(s).replace(/\r\n/g, '\n');
+      assert.strictEqual(
+        normalizeEol(V.CHARACTER_SVG_SOURCES[relSvgKey]),
+        normalizeEol(svgText),
+        `${id}: characterSvgRegistry.js out of sync with disk`
+      );
       for (const layerId of diskManifest.requiredLayers) {
         assert(svgText.includes(`data-layer="${layerId}"`), `${id}: SVG missing layer ${layerId}`);
       }
