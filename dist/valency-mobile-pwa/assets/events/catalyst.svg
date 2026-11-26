@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#19162b"/>
+      <stop offset="100%" stop-color="#1e1b0f"/>
+    </linearGradient>
+    <radialGradient id="prismGlow" cx="50%" cy="54%" r="48%">
+      <stop offset="0%" stop-color="#fde047" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="prism" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fef9c3"/>
+      <stop offset="50%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <circle cx="120" cy="86" r="76" fill="url(#prismGlow)"/>
+  <!-- High activation barrier curve (faded) vs lowered catalyzed curve (bright) -->
+  <path d="M36 122 Q120 6 204 122" fill="none" stroke="rgba(148,163,184,0.3)" stroke-width="2" stroke-dasharray="5 5"/>
+  <path d="M48 92 Q120 44 192 92" fill="none" stroke="#fde047" stroke-width="3.5"/>
+  <!-- Left & Right Reactant Atoms -->
+  <circle cx="48" cy="92" r="18" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
+  <circle cx="192" cy="92" r="18" fill="#7c3aed" stroke="#ddd6fe" stroke-width="2"/>
+  <!-- Radiant Golden Catalyst Prism -->
+  <polygon points="120,40 152,86 120,132 88,86" fill="url(#prism)" stroke="#ffffff" stroke-width="2"/>
+  <polygon points="120,40 136,86 120,132 104,86" fill="#fef9c3" opacity="0.45"/>
+  <!-- Sparkles -->
+  <g fill="#ffffff">
+    <circle cx="82" cy="54" r="2.2"/>
+    <circle cx="158" cy="54" r="2.2"/>
+    <circle cx="120" cy="24" r="2.8"/>
+  </g>
+</svg>

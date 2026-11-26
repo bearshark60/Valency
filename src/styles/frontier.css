@@ -1,27 +1,28 @@
-/* VALENCY: The Elemental Frontier — Independent Desktop Overworld Stylesheet
- * Scoped strictly to Frontier menu CTA and #frontier-screen so existing card battle & Story UI stay untouched.
+/* VALENCY: The Elemental Frontier — Overworld Prototype Stylesheet
+ * Strictly scoped to #menu-btn-frontier-overworld, body.frontier-overworld-active,
+ * and #frontier-overworld-screen so zero selectors collide with Stage 3B Frontier Hub or card battle UI.
  */
 
 /* ===== MENU ENTRY CTA ===== */
-.menu-cta-frontier {
+#menu-btn-frontier-overworld {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(14, 116, 144, 0.34), rgba(15, 23, 42, 0.96));
   border-color: rgba(52, 211, 153, 0.62);
   box-shadow: 0 10px 24px rgba(16, 185, 129, 0.16);
 }
 
-.menu-cta-frontier:hover {
+#menu-btn-frontier-overworld:hover {
   border-color: #5eead4;
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.36), rgba(14, 116, 144, 0.45), rgba(15, 23, 42, 0.96));
   box-shadow: 0 14px 30px rgba(45, 212, 191, 0.28);
 }
 
-/* Lock page scroll cleanly while Frontier overworld is open */
-body.frontier-active {
+/* Lock page scroll cleanly while Frontier Overworld is active */
+body.frontier-overworld-active {
   overflow: hidden;
 }
 
 /* ===== FULL-SCREEN FRONTIER OVERWORLD SHELL ===== */
-.frontier-screen {
+#frontier-overworld-screen {
   position: fixed;
   inset: 0;
   z-index: 45;
@@ -35,12 +36,11 @@ body.frontier-active {
   user-select: none;
 }
 
-.frontier-screen.hidden {
+#frontier-overworld-screen.hidden {
   display: none;
 }
 
-/* Top HUD Bar */
-.frontier-topbar {
+#frontier-overworld-screen .fo-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,15 +53,15 @@ body.frontier-active {
   z-index: 5;
 }
 
-.frontier-top-left,
-.frontier-top-right {
+#frontier-overworld-screen .fo-top-left,
+#frontier-overworld-screen .fo-top-right {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
 
-.frontier-title-group {
+#frontier-overworld-screen .fo-title-group {
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -69,7 +69,7 @@ body.frontier-active {
   overflow: hidden;
 }
 
-.frontier-title {
+#frontier-overworld-screen .fo-title {
   font-size: 15px;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -77,7 +77,7 @@ body.frontier-active {
   white-space: nowrap;
 }
 
-.frontier-zone-sub {
+#frontier-overworld-screen .fo-zone-sub {
   font-size: 12px;
   font-weight: 600;
   color: #94a3b8;
@@ -86,15 +86,14 @@ body.frontier-active {
   text-overflow: ellipsis;
 }
 
-.frontier-exit-btn,
-.frontier-ctrl-btn {
+#frontier-overworld-screen .fo-exit-btn,
+#frontier-overworld-screen .fo-ctrl-btn {
   min-height: 34px;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Canvas Viewport Wrapper */
-.frontier-canvas-wrap {
+#frontier-overworld-screen .fo-canvas-wrap {
   position: relative;
   flex: 1;
   width: 100%;
@@ -102,14 +101,13 @@ body.frontier-active {
   overflow: hidden;
 }
 
-.frontier-canvas {
+#frontier-overworld-screen .fo-canvas {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* Compact Telemetry Chip (Bottom-Right) */
-.frontier-hud-telemetry {
+#frontier-overworld-screen .fo-hud-telemetry {
   position: absolute;
   right: 14px;
   bottom: 14px;
@@ -129,12 +127,11 @@ body.frontier-active {
   backdrop-filter: blur(4px);
 }
 
-.frontier-hud-sep {
+#frontier-overworld-screen .fo-hud-sep {
   color: rgba(148, 163, 184, 0.45);
 }
 
-/* Desktop Controls Hint (Bottom-Center) */
-.frontier-controls-hint {
+#frontier-overworld-screen .fo-controls-hint {
   position: absolute;
   left: 50%;
   bottom: 14px;

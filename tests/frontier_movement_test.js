@@ -28,16 +28,26 @@ const sandbox = {
 };
 sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
+
+// Simulate pre-existing Stage 3B Frontier Hub managers already living on window.Valency.Frontier
+const STAGE3B_SENTINEL = Object.freeze({ owner: 'stage3b' });
+sandbox.Valency = {
+  Frontier: {
+    WorldManager: STAGE3B_SENTINEL,
+    ExpeditionManager: STAGE3B_SENTINEL,
+    PlayerProfile: STAGE3B_SENTINEL,
+  },
+};
 vm.createContext(sandbox);
 
 const FRONTIER_SCRIPTS = [
-  'src/frontier/world.js',
-  'src/frontier/player.js',
-  'src/frontier/movement.js',
-  'src/frontier/camera.js',
-  'src/frontier/inputKeyboard.js',
-  'src/frontier/topDownRenderer.js',
-  'src/frontier/frontier.js',
+  'src/frontier/overworld/world.js',
+  'src/frontier/overworld/player.js',
+  'src/frontier/overworld/movement.js',
+  'src/frontier/overworld/camera.js',
+  'src/frontier/overworld/inputKeyboard.js',
+  'src/frontier/overworld/topDownRenderer.js',
+  'src/frontier/overworld/frontier.js',
 ];
 
 for (const rel of FRONTIER_SCRIPTS) {
@@ -46,7 +56,7 @@ for (const rel of FRONTIER_SCRIPTS) {
 }
 
 const V = sandbox.Valency;
-const F = V.Frontier;
+const F = V.Frontier.Overworld;
 let passed = 0;
 let failed = 0;
 
@@ -266,11 +276,17 @@ test('index.html Integration: preserves all existing scripts/buttons and wires d
     assert.ok(html.includes(`id="${id}"`), `Existing DOM ID #${id} must remain intact`);
   }
 
-  // New Frontier elements present and mobile joystick script removed
+  // Overworld elements use isolated IDs that never collide with Stage 3B's #menu-btn-frontier Hub CTA
   assert.ok(html.includes('href="src/styles/frontier.css"'), 'frontier.css must be linked');
-  assert.ok(html.includes('id="menu-btn-frontier"'), '#menu-btn-frontier CTA must exist');
-  assert.ok(html.includes('id="frontier-screen"'), '#frontier-screen container must exist');
-  assert.ok(!html.includes('inputJoystick.js'), 'Mobile joystick script must not be loaded');
+  assert.ok(html.includes('id="menu-btn-frontier-overworld"'), '#menu-btn-frontier-overworld CTA must exist');
+  assert.ok(html.includes('id="frontier-overworld-screen"'), '#frontier-overworld-screen container must exist');
+  assert.ok(!html.includes('id="menu-btn-frontier"'), 'Must not claim Stage 3B-owned #menu-btn-frontier');
+  assert.ok(!html.includes('id="frontier-screen"'), 'Must not claim generic #frontier-screen');
+
+  // Stylesheet must be strictly scoped (no Stage 3B-owned .menu-cta-frontier or generic .frontier-* selectors)
+  const css = fs.readFileSync(path.join(ROOT, 'src/styles/frontier.css'), 'utf8');
+  assert.ok(!/\.menu-cta-frontier\b(?!-)/.test(css), 'frontier.css must not style Stage 3B .menu-cta-frontier');
+  assert.ok(!/(^|[\s,}])\.frontier-/m.test(css), 'frontier.css must not declare unscoped .frontier-* selectors');
 
   // Script order: app.js loads before Frontier modules, and Frontier scripts are in dependency order
   const appIdx = html.indexOf('src/ui/app.js');
@@ -280,6 +296,19 @@ test('index.html Integration: preserves all existing scripts/buttons and wires d
     const idx = html.indexOf(rel);
     assert.ok(idx > prevIdx, `Script ${rel} must load after previous script in index.html`);
     prevIdx = idx;
+  }
+});
+
+// ===== TEST 7: NAMESPACE ISOLATION FROM STAGE 3B FRONTIER HUB =====
+test('Namespace Isolation: overworld lives only under V.Frontier.Overworld and preserves Stage 3B managers', () => {
+  const frontierKeys = Object.keys(V.Frontier).sort();
+  assert.deepStrictEqual(frontierKeys, ['ExpeditionManager', 'Overworld', 'PlayerProfile', 'WorldManager']);
+  assert.strictEqual(V.Frontier.WorldManager, STAGE3B_SENTINEL, 'Stage 3B WorldManager must be untouched');
+  assert.strictEqual(V.Frontier.ExpeditionManager, STAGE3B_SENTINEL, 'Stage 3B ExpeditionManager must be untouched');
+  assert.strictEqual(V.Frontier.PlayerProfile, STAGE3B_SENTINEL, 'Stage 3B PlayerProfile must be untouched');
+  for (const key of ['World', 'Player', 'Movement', 'Camera', 'KeyboardInput', 'TopDownRenderer', 'enter', 'exit', 'getState']) {
+    assert.ok(F[key], `V.Frontier.Overworld.${key} must exist`);
+    assert.strictEqual(V.Frontier[key], undefined, `V.Frontier.${key} must NOT leak to the shared Frontier namespace`);
   }
 });
 

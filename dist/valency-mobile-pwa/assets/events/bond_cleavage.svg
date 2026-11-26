@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1c0a18"/>
+      <stop offset="50%" stop-color="#2a0d1c"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <radialGradient id="atomL" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="55%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </radialGradient>
+    <radialGradient id="atomR" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="55%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
+    </radialGradient>
+    <radialGradient id="flash" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#f43f5e" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <!-- Severed bond halves -->
+  <line x1="68" y1="84" x2="108" y2="84" stroke="#7dd3fc" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <line x1="132" y1="84" x2="172" y2="84" stroke="#fdba74" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <!-- Left & Right Atoms pushed apart -->
+  <circle cx="62" cy="84" r="28" fill="url(#atomL)" stroke="#e0f2fe" stroke-width="2"/>
+  <circle cx="178" cy="84" r="28" fill="url(#atomR)" stroke="#fef3c7" stroke-width="2"/>
+  <!-- Impact flash -->
+  <circle cx="120" cy="84" r="40" fill="url(#flash)"/>
+  <!-- Blazing diagonal laser slash -->
+  <line x1="158" y1="10" x2="82" y2="152" stroke="#f43f5e" stroke-width="11" stroke-linecap="round" opacity="0.55"/>
+  <line x1="158" y1="10" x2="82" y2="152" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round"/>
+  <!-- Sparks flying out -->
+  <g stroke="#fef08a" stroke-width="2.2" stroke-linecap="round">
+    <line x1="120" y1="84" x2="94" y2="52"/>
+    <line x1="120" y1="84" x2="148" y2="58"/>
+    <line x1="120" y1="84" x2="98" y2="112"/>
+    <line x1="120" y1="84" x2="150" y2="114"/>
+    <line x1="120" y1="84" x2="120" y2="44"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="90" cy="48" r="2.5"/>
+    <circle cx="154" cy="54" r="2.5"/>
+    <circle cx="154" cy="118" r="2.5"/>
+    <circle cx="94" cy="118" r="2"/>
+  </g>
+</svg>

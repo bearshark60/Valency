@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#19082b"/>
+      <stop offset="55%" stop-color="#271042"/>
+      <stop offset="100%" stop-color="#0b1b26"/>
+    </linearGradient>
+    <radialGradient id="dome" cx="50%" cy="50%" r="50%">
+      <stop offset="65%" stop-color="#22c55e" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#4ade80" stop-opacity="0.5"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <!-- Shattering Emerald Noble Gas Shield Dome -->
+  <circle cx="136" cy="92" r="46" fill="url(#dome)" stroke="#4ade80" stroke-width="3" stroke-dasharray="28 6 18 8 42 5"/>
+  <!-- Inner protected molecule -->
+  <g stroke="#93c5fd" stroke-width="2.2">
+    <line x1="120" y1="98" x2="136" y2="84"/>
+    <line x1="136" y1="84" x2="154" y2="98"/>
+  </g>
+  <circle cx="136" cy="84" r="10" fill="#2563eb" stroke="#bfdbfe" stroke-width="1.5"/>
+  <circle cx="120" cy="98" r="7" fill="#38bdf8" stroke="#e0f2fe" stroke-width="1.2"/>
+  <circle cx="154" cy="98" r="7" fill="#38bdf8" stroke="#e0f2fe" stroke-width="1.2"/>
+  <!-- Flying broken green shield shards -->
+  <g fill="#4ade80" stroke="#dcfce7" stroke-width="1" opacity="0.9">
+    <polygon points="84,48 98,54 88,66"/>
+    <polygon points="74,82 86,78 82,94"/>
+    <polygon points="104,32 118,38 108,46"/>
+    <polygon points="178,48 192,42 186,60"/>
+  </g>
+  <!-- Crackling Violet-White Plasma Bolt -->
+  <polyline points="16,18 68,48 56,62 104,76" fill="none" stroke="#d946ef" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+  <polyline points="16,18 68,48 56,62 104,76" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="104" cy="76" r="12" fill="#f0abfc" opacity="0.8"/>
+  <circle cx="104" cy="76" r="5" fill="#ffffff"/>
+</svg>

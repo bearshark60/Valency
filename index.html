@@ -28,7 +28,7 @@
           <span class="menu-cta-arrow">→</span>
         </button>
 
-        <button id="menu-btn-frontier" class="menu-cta menu-cta-frontier">
+        <button id="menu-btn-frontier-overworld" class="menu-cta menu-cta-frontier-overworld">
           <span class="menu-cta-icon">🧭</span>
           <span class="menu-cta-text">
             <strong>Frontier Overworld (Prototype)</strong>
@@ -200,8 +200,8 @@
     </div>
   </div>
 
-  <!-- Independent Frontier Overworld Layer (Hidden until Frontier Mode is entered) -->
-  <div id="frontier-screen" class="frontier-screen hidden" aria-label="Valency Frontier Overworld"></div>
+  <!-- Independent Frontier Overworld Layer (Hidden until Overworld Mode is entered) -->
+  <div id="frontier-overworld-screen" class="frontier-overworld-screen hidden" aria-label="Valency Frontier Overworld"></div>
 
   <!-- Non-blocking Reaction & Atomic FX Layer -->
   <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
@@ -237,13 +237,13 @@
   <script src="src/ui/tutorial.js"></script>
   <script src="src/ui/storyUI.js"></script>
   <script src="src/ui/app.js"></script>
-  <!-- Independent Frontier Overworld Layer (Decoupled from Card Engine & Rendering) -->
-  <script src="src/frontier/world.js"></script>
-  <script src="src/frontier/player.js"></script>
-  <script src="src/frontier/movement.js"></script>
-  <script src="src/frontier/camera.js"></script>
-  <script src="src/frontier/inputKeyboard.js"></script>
-  <script src="src/frontier/topDownRenderer.js"></script>
-  <script src="src/frontier/frontier.js"></script>
+  <!-- Independent Frontier Overworld Layer (Isolated under V.Frontier.Overworld) -->
+  <script src="src/frontier/overworld/world.js"></script>
+  <script src="src/frontier/overworld/player.js"></script>
+  <script src="src/frontier/overworld/movement.js"></script>
+  <script src="src/frontier/overworld/camera.js"></script>
+  <script src="src/frontier/overworld/inputKeyboard.js"></script>
+  <script src="src/frontier/overworld/topDownRenderer.js"></script>
+  <script src="src/frontier/overworld/frontier.js"></script>
 </body>
 </html>

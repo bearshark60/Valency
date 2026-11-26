@@ -1,24 +1,18 @@
-// VALENCY: The Elemental Frontier — Movement & Kinematics System
-// Pure 8-direction + analog movement math with normalized diagonal vectors,
-// isotropic acceleration/deceleration, substep anti-tunneling, and world collision integration.
+// VALENCY: The Elemental Frontier — Overworld Movement & Kinematics System
+// Pure 8-direction + analog movement math under window.Valency.Frontier.Overworld.
 // Strictly decoupled from rendering and DOM input devices.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
   const F = (V.Frontier = V.Frontier || {});
+  const O = (F.Overworld = F.Overworld || {});
 
   const DEFAULT_DEADZONE = 0.08;
   const MAX_FRAME_DT = 0.25;
   const MAX_SUBSTEP_DT = 1 / 60;
   const STOP_SPEED_EPSILON = 1.5;
 
-  /**
-   * Normalize a raw 2D input vector (e.g., digital keyboard or analog controller).
-   * - Applies radial deadzone and smoothly remaps [deadzone, 1] -> [0, 1].
-   * - Clamps length to <= 1.0 so diagonal keyboard vectors (1, 1) normalize to (~0.7071, ~0.7071)
-   *   and never exceed cardinal movement speed.
-   */
   function normalizeInputVector(rawX, rawY, deadzone) {
     const x = Number(rawX) || 0;
     const y = Number(rawY) || 0;
@@ -31,8 +25,6 @@
 
     const ux = x / len;
     const uy = y / len;
-
-    // Preserve analog ramp inside (dz, 1), clamp at 1.0 for diagonals / saturated inputs
     const scaledMag = len >= 1 ? 1 : (len - dz) / (1 - dz);
     const clampedMag = Math.max(0, Math.min(1, scaledMag));
 
@@ -44,9 +36,6 @@
     };
   }
 
-  /**
-   * Combine multiple independent input providers into one normalized movement vector bounded to unit magnitude.
-   */
   function combineInputVectors(vectors, deadzone) {
     if (!Array.isArray(vectors) || vectors.length === 0) {
       return { x: 0, y: 0, magnitude: 0, active: false };
@@ -62,9 +51,6 @@
     return normalizeInputVector(sumX, sumY, deadzone);
   }
 
-  /**
-   * Move velocity smoothly toward target velocity using isotropic rate-limited stepping.
-   */
   function approachVelocity(vx, vy, targetVx, targetVy, accelRate, dt) {
     const dvx = targetVx - vx;
     const dvy = targetVy - vy;
@@ -82,10 +68,6 @@
     };
   }
 
-  /**
-   * Advance player world position and kinematics by dtSeconds using normalized input and world collision.
-   * Substeps large frame deltas to prevent tunneling through thin walls on frame hitches.
-   */
   function stepPlayerMovement(player, rawInput, dtSeconds, world, options) {
     if (!player) return null;
     const opts = options || {};
@@ -137,8 +119,8 @@
       const desiredX = prevX + player.vx * subDt;
       const desiredY = prevY + player.vy * subDt;
 
-      if (world && F.World && typeof F.World.resolveCollisions === 'function') {
-        const res = F.World.resolveCollisions(desiredX, desiredY, player.radius, world);
+      if (world && O.World && typeof O.World.resolveCollisions === 'function') {
+        const res = O.World.resolveCollisions(desiredX, desiredY, player.radius, world);
         player.x = res.x;
         player.y = res.y;
 
@@ -148,7 +130,6 @@
           for (let i = 0; i < res.hitIds.length; i++) {
             hitIdSet.add(res.hitIds[i]);
           }
-          // Damp blocked velocity components so pushing into a wall does not store phantom momentum
           const actualVx = (player.x - prevX) / subDt;
           const actualVy = (player.y - prevY) / subDt;
           if (Math.abs(desiredX - player.x) > 1e-4) player.vx = actualVx;
@@ -165,18 +146,16 @@
     const currentSpeed = Math.hypot(player.vx, player.vy);
     const speedRatio = player.speed > 0 ? Math.min(1, currentSpeed / player.speed) : 0;
 
-    // Update facing from active input first (feels responsive even while sliding along a wall),
-    // falling back to actual velocity vector when coasting to a stop.
     if (norm.active) {
       const len = Math.hypot(norm.x, norm.y) || 1;
       player.facing = { x: norm.x / len, y: norm.y / len };
-      if (F.Player && F.Player.directionFromVector) {
-        player.facingDir = F.Player.directionFromVector(player.facing.x, player.facing.y, player.facingDir);
+      if (O.Player && O.Player.directionFromVector) {
+        player.facingDir = O.Player.directionFromVector(player.facing.x, player.facing.y, player.facingDir);
       }
     } else if (currentSpeed > STOP_SPEED_EPSILON) {
       player.facing = { x: player.vx / currentSpeed, y: player.vy / currentSpeed };
-      if (F.Player && F.Player.directionFromVector) {
-        player.facingDir = F.Player.directionFromVector(player.facing.x, player.facing.y, player.facingDir);
+      if (O.Player && O.Player.directionFromVector) {
+        player.facingDir = O.Player.directionFromVector(player.facing.x, player.facing.y, player.facingDir);
       }
     }
 
@@ -202,7 +181,7 @@
     };
   }
 
-  F.Movement = {
+  O.Movement = {
     DEFAULT_DEADZONE,
     MAX_FRAME_DT,
     MAX_SUBSTEP_DT,

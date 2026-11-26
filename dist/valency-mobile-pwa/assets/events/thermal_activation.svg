@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b1024"/>
+      <stop offset="100%" stop-color="#171636"/>
+    </linearGradient>
+    <linearGradient id="flameOuter" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="60%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <radialGradient id="flaskGlow" cx="50%" cy="46%" r="42%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <circle cx="120" cy="76" r="68" fill="url(#flaskGlow)"/>
+  <!-- Bunsen Burner Base & Flame -->
+  <rect x="112" y="132" width="16" height="24" rx="2" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>
+  <path d="M120 96 C135 112 134 128 120 134 C106 128 105 112 120 96Z" fill="url(#flameOuter)"/>
+  <path d="M120 110 C127 120 126 129 120 133 C114 129 113 120 120 110Z" fill="#ffffff" opacity="0.9"/>
+  <!-- Round-Bottom Flask above flame -->
+  <circle cx="120" cy="68" r="34" fill="rgba(56,189,248,0.16)" stroke="#e2e8f0" stroke-width="2.4"/>
+  <rect x="110" y="16" width="20" height="22" fill="rgba(255,255,255,0.08)" stroke="#e2e8f0" stroke-width="2.2"/>
+  <!-- Boiling energized liquid -->
+  <path d="M89 74 A32 32 0 0 0 151 74 Z" fill="#6366f1" opacity="0.72"/>
+  <!-- Dancing energized atoms & bubbles -->
+  <g>
+    <circle cx="106" cy="78" r="4.5" fill="#fde047"/>
+    <circle cx="124" cy="64" r="5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.2"/>
+    <circle cx="136" cy="76" r="4" fill="#f472b6"/>
+    <circle cx="114" cy="50" r="3.5" fill="#e0f2fe"/>
+    <circle cx="122" cy="30" r="3" fill="#fde047" opacity="0.9"/>
+    <circle cx="117" cy="22" r="2.2" fill="#7dd3fc"/>
+  </g>
+</svg>

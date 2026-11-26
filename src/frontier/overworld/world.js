@@ -1,11 +1,12 @@
-// VALENCY: The Elemental Frontier — World Space & Collision Geometry Module
-// Pure world-coordinate data and physics/collision solver.
+// VALENCY: The Elemental Frontier — Overworld World Space & Collision Geometry Module
+// Pure world-coordinate data and physics/collision solver under window.Valency.Frontier.Overworld.
 // Strictly rendering-independent: zero DOM, Canvas, or screen-projection dependencies.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
   const F = (V.Frontier = V.Frontier || {});
+  const O = (F.Overworld = F.Overworld || {});
 
   const DEFAULT_TILE_SIZE = 64;
 
@@ -50,7 +51,6 @@
       ],
       // Solid static collision geometry (pure world-space AABBs and circles)
       colliders: [
-        // North-West Field Laboratory HQ
         {
           id: 'field_lab_hq',
           kind: 'rect',
@@ -61,7 +61,6 @@
           tag: 'building',
           label: 'Field Lab HQ',
         },
-        // North-East Synthesis Containment Bay
         {
           id: 'containment_bay',
           kind: 'rect',
@@ -72,7 +71,6 @@
           tag: 'building',
           label: 'Containment Bay',
         },
-        // West Outdoor Analysis Bench
         {
           id: 'analysis_bench',
           kind: 'rect',
@@ -83,7 +81,6 @@
           tag: 'prop',
           label: 'Analysis Bench',
         },
-        // South-West Supply Crates
         {
           id: 'supply_crates_sw',
           kind: 'rect',
@@ -94,7 +91,6 @@
           tag: 'crate',
           label: 'Reagent Crates',
         },
-        // Southern Perimeter Checkpoints (with a central 256-unit walkable gate)
         {
           id: 'south_wall_west',
           kind: 'rect',
@@ -115,7 +111,6 @@
           tag: 'wall',
           label: 'Perimeter Barrier',
         },
-        // Circular natural/tech obstacles (for smooth curved deflection testing)
         {
           id: 'beacon_nw',
           kind: 'circle',
@@ -165,9 +160,6 @@
     };
   }
 
-  /**
-   * Clamp a circular entity inside the world boundary.
-   */
   function clampToWorldBounds(x, y, radius, world) {
     const r = Math.max(0, Number(radius) || 0);
     const bounds = (world && world.bounds) || {
@@ -194,10 +186,6 @@
     };
   }
 
-  /**
-   * Resolve circle-vs-AABB collision in world space.
-   * Returns adjusted { x, y, collided } with exact shortest push-out vector.
-   */
   function resolveCircleRect(x, y, radius, rect) {
     const r = Math.max(0, Number(radius) || 0);
     const left = rect.x;
@@ -216,7 +204,6 @@
       return { x, y, collided: false };
     }
 
-    // Center is strictly outside the rectangle
     if (distSq > 1e-12) {
       const dist = Math.sqrt(distSq);
       const overlap = r - dist;
@@ -227,7 +214,6 @@
       };
     }
 
-    // Center is inside or exactly on an edge of the rectangle: push along shallowest axis
     const penLeft = Math.abs(x - left);
     const penRight = Math.abs(right - x);
     const penTop = Math.abs(y - top);
@@ -240,9 +226,6 @@
     return { x, y: bottom + r, collided: true };
   }
 
-  /**
-   * Resolve circle-vs-circle collision in world space.
-   */
   function resolveCircleCircle(x, y, radius, circle) {
     const r = Math.max(0, Number(radius) || 0);
     const minDist = r + Math.max(0, Number(circle.radius) || 0);
@@ -264,7 +247,6 @@
       };
     }
 
-    // Exact center coincidence: push deterministically along +X
     return {
       x: circle.x + minDist,
       y,
@@ -272,10 +254,6 @@
     };
   }
 
-  /**
-   * Iteratively resolve all world colliders and outer world boundaries for a circular entity.
-   * Multiple passes ensure clean corner sliding without penetration or jitter.
-   */
   function resolveCollisions(x, y, radius, world, maxIterations) {
     const passes = Math.max(1, maxIterations || 4);
     let curX = x;
@@ -331,15 +309,12 @@
     };
   }
 
-  /**
-   * Pure query: returns true if a circle at (x, y) is inside world bounds and clears all colliders.
-   */
   function isPositionClear(x, y, radius, world) {
     const res = resolveCollisions(x, y, radius, world, 1);
     return !res.collided;
   }
 
-  F.World = {
+  O.World = {
     DEFAULT_TILE_SIZE,
     createTestWorld,
     clampToWorldBounds,

@@ -1,11 +1,12 @@
-// VALENCY: The Elemental Frontier — Overworld Prototype Orchestrator (Desktop)
-// Independent layer managing Frontier lifecycle, simulation loop, keyboard input,
-// world-space camera tracking, swappable renderer, and clean entry/exit without touching Story Mode or card battles.
+// VALENCY: The Elemental Frontier — Overworld Prototype Orchestrator
+// Isolated under window.Valency.Frontier.Overworld and #frontier-overworld-screen
+// so zero globals, DOM IDs, or selectors collide with Stage 3B Frontier Hub managers or UI.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
   const F = (V.Frontier = V.Frontier || {});
+  const O = (F.Overworld = F.Overworld || {});
 
   let active = false;
   let initialized = false;
@@ -31,7 +32,7 @@
     const w = Math.max(1, Math.floor(rect.width || window.innerWidth || 800));
     const h = Math.max(1, Math.floor(rect.height || window.innerHeight || 600));
     renderer.resize(w, h);
-    F.Camera.setViewport(camera, w, h, world);
+    O.Camera.setViewport(camera, w, h, world);
     if (active) {
       renderer.render(world, player, camera);
     }
@@ -58,9 +59,9 @@
     if (keyboard) inputSources.push(keyboard.getVector());
     if (externalInput) inputSources.push(externalInput);
 
-    const combined = F.Movement.combineInputVectors(inputSources);
-    const moveRes = F.Movement.stepPlayerMovement(player, combined, dtSeconds, world);
-    F.Camera.updateCamera(camera, player.x, player.y, dtSeconds, world);
+    const combined = O.Movement.combineInputVectors(inputSources);
+    const moveRes = O.Movement.stepPlayerMovement(player, combined, dtSeconds, world);
+    O.Camera.updateCamera(camera, player.x, player.y, dtSeconds, world);
     updateHudReadout();
 
     if (renderer && active) {
@@ -83,50 +84,50 @@
     if (initialized) return true;
     if (typeof document === 'undefined') return false;
 
-    elScreen = document.getElementById('frontier-screen');
+    elScreen = document.getElementById('frontier-overworld-screen');
     if (!elScreen) {
       elScreen = document.createElement('div');
-      elScreen.id = 'frontier-screen';
-      elScreen.className = 'frontier-screen hidden';
+      elScreen.id = 'frontier-overworld-screen';
+      elScreen.className = 'frontier-overworld-screen hidden';
       document.body.appendChild(elScreen);
     }
 
     elScreen.innerHTML = `
-      <header class="frontier-topbar">
-        <div class="frontier-top-left">
-          <button id="frontier-btn-exit" class="ctrl-btn frontier-exit-btn" type="button" title="Return to Main Menu (Esc)">← Menu</button>
-          <div class="frontier-title-group">
-            <span class="frontier-title">FRONTIER</span>
-            <span class="frontier-zone-sub">Outpost Alpha • Top-Down Prototype</span>
+      <header class="fo-topbar">
+        <div class="fo-top-left">
+          <button id="frontier-overworld-btn-exit" class="ctrl-btn fo-exit-btn" type="button" title="Return to Main Menu (Esc)">← Menu</button>
+          <div class="fo-title-group">
+            <span class="fo-title">FRONTIER OVERWORLD</span>
+            <span class="fo-zone-sub">Outpost Alpha • Top-Down Prototype</span>
           </div>
         </div>
-        <div class="frontier-top-right">
-          <button id="frontier-btn-reset" class="ctrl-btn frontier-ctrl-btn" type="button" title="Reset scientist to courtyard spawn">↺ Spawn</button>
+        <div class="fo-top-right">
+          <button id="frontier-overworld-btn-reset" class="ctrl-btn fo-ctrl-btn" type="button" title="Reset scientist to courtyard spawn">↺ Spawn</button>
         </div>
       </header>
-      <div id="frontier-canvas-wrap" class="frontier-canvas-wrap">
-        <canvas id="frontier-canvas" class="frontier-canvas" aria-label="Frontier overworld map"></canvas>
-        <div id="frontier-hud-telemetry" class="frontier-hud-telemetry" aria-live="off">
-          <span id="frontier-coords">X:960 Y:640</span>
-          <span class="frontier-hud-sep">|</span>
-          <span id="frontier-dir">S • IDLE</span>
+      <div id="frontier-overworld-canvas-wrap" class="fo-canvas-wrap">
+        <canvas id="frontier-overworld-canvas" class="fo-canvas" aria-label="Frontier overworld map"></canvas>
+        <div id="frontier-overworld-hud-telemetry" class="fo-hud-telemetry" aria-live="off">
+          <span id="frontier-overworld-coords">X:960 Y:640</span>
+          <span class="fo-hud-sep">|</span>
+          <span id="frontier-overworld-dir">S • IDLE</span>
         </div>
-        <div id="frontier-controls-hint" class="frontier-controls-hint">Move: WASD / Arrow Keys • Esc: Menu</div>
+        <div id="frontier-overworld-controls-hint" class="fo-controls-hint">Move: WASD / Arrow Keys • Esc: Menu</div>
       </div>
     `;
 
-    elCanvasWrap = elScreen.querySelector('#frontier-canvas-wrap');
-    elCanvas = elScreen.querySelector('#frontier-canvas');
-    elCoordsReadout = elScreen.querySelector('#frontier-coords');
-    elDirReadout = elScreen.querySelector('#frontier-dir');
+    elCanvasWrap = elScreen.querySelector('#frontier-overworld-canvas-wrap');
+    elCanvas = elScreen.querySelector('#frontier-overworld-canvas');
+    elCoordsReadout = elScreen.querySelector('#frontier-overworld-coords');
+    elDirReadout = elScreen.querySelector('#frontier-overworld-dir');
 
-    const btnExit = elScreen.querySelector('#frontier-btn-exit');
-    const btnReset = elScreen.querySelector('#frontier-btn-reset');
+    const btnExit = elScreen.querySelector('#frontier-overworld-btn-exit');
+    const btnReset = elScreen.querySelector('#frontier-overworld-btn-reset');
 
     if (btnExit) {
       btnExit.addEventListener('click', () => {
         if (V.Sound && V.Sound.playButtonClick) V.Sound.playButtonClick();
-        exitFrontier();
+        exitOverworld();
       });
     }
 
@@ -138,13 +139,13 @@
     }
 
     // Core simulation objects (rendering-independent)
-    world = F.World.createTestWorld();
-    player = F.Player.createPlayer({
+    world = O.World.createTestWorld();
+    player = O.Player.createPlayer({
       x: world.spawn.x,
       y: world.spawn.y,
       name: 'Field Chemist',
     });
-    camera = F.Camera.createCamera({
+    camera = O.Camera.createCamera({
       x: player.x,
       y: player.y,
       viewportWidth: window.innerWidth || 800,
@@ -155,12 +156,12 @@
     });
 
     // Swappable presentation renderer
-    renderer = F.TopDownRenderer.createTopDownRenderer(elCanvas);
+    renderer = O.TopDownRenderer.createTopDownRenderer(elCanvas);
 
     // Decoupled desktop keyboard input provider
-    keyboard = F.KeyboardInput.createKeyboardInput({
+    keyboard = O.KeyboardInput.createKeyboardInput({
       onEscape: () => {
-        if (active) exitFrontier();
+        if (active) exitOverworld();
       },
     });
 
@@ -176,18 +177,15 @@
 
   function resetPosition() {
     if (!world || !player || !camera) return;
-    F.Player.resetPlayer(player, world.spawn.x, world.spawn.y);
-    F.Camera.snapTo(camera, player.x, player.y, world);
+    O.Player.resetPlayer(player, world.spawn.x, world.spawn.y);
+    O.Camera.snapTo(camera, player.x, player.y, world);
     updateHudReadout();
     if (renderer && active) {
       renderer.render(world, player, camera);
     }
   }
 
-  /**
-   * Enter the Frontier Overworld layer cleanly without altering card-battle or Story Mode state.
-   */
-  function enterFrontier() {
+  function enterOverworld() {
     if (!buildDOM()) return false;
     if (active) return true;
 
@@ -197,14 +195,14 @@
     if (menuEl) menuEl.classList.add('hidden');
     if (appEl) appEl.classList.add('hidden');
 
-    document.body.classList.add('frontier-active');
+    document.body.classList.add('frontier-overworld-active');
     elScreen.classList.remove('hidden');
 
     active = true;
     lastTimestamp = 0;
 
     handleResize();
-    F.Camera.snapTo(camera, player.x, player.y, world);
+    O.Camera.snapTo(camera, player.x, player.y, world);
     keyboard.enable();
     updateHudReadout();
     renderer.render(world, player, camera);
@@ -215,10 +213,7 @@
     return true;
   }
 
-  /**
-   * Exit the Frontier Overworld cleanly and restore the Valency Main Menu with zero leaked state.
-   */
-  function exitFrontier() {
+  function exitOverworld() {
     if (!active && elScreen && elScreen.classList.contains('hidden')) return false;
 
     active = false;
@@ -230,7 +225,7 @@
 
     if (keyboard) keyboard.disable();
 
-    document.body.classList.remove('frontier-active');
+    document.body.classList.remove('frontier-overworld-active');
     if (elScreen) elScreen.classList.add('hidden');
 
     if (V.UI && typeof V.UI.showMenuScreen === 'function') {
@@ -255,16 +250,15 @@
     };
   }
 
-  // Bind non-invasive menu entry button on load
   function bindMenuEntry() {
     if (typeof document === 'undefined') return;
-    const btn = document.getElementById('menu-btn-frontier');
-    if (!btn || btn.dataset.frontierBound === '1') return;
-    btn.dataset.frontierBound = '1';
+    const btn = document.getElementById('menu-btn-frontier-overworld');
+    if (!btn || btn.dataset.frontierOverworldBound === '1') return;
+    btn.dataset.frontierOverworldBound = '1';
     btn.addEventListener('click', () => {
       if (V.Sound && V.Sound.unlockAudio) V.Sound.unlockAudio();
       if (V.Sound && V.Sound.playButtonClick) V.Sound.playButtonClick();
-      enterFrontier();
+      enterOverworld();
     });
   }
 
@@ -276,12 +270,12 @@
     }
   }
 
-  // Public Frontier API
-  F.enter = enterFrontier;
-  F.exit = exitFrontier;
-  F.isActive = () => active;
-  F.resetPosition = resetPosition;
-  F.stepSimulation = stepSimulation;
-  F.getState = getState;
-  F._getInputsForTest = () => ({ keyboard });
+  // Public Overworld API (strictly under window.Valency.Frontier.Overworld)
+  O.enter = enterOverworld;
+  O.exit = exitOverworld;
+  O.isActive = () => active;
+  O.resetPosition = resetPosition;
+  O.stepSimulation = stepSimulation;
+  O.getState = getState;
+  O._getInputsForTest = () => ({ keyboard });
 })(typeof window !== 'undefined' ? window : globalThis);

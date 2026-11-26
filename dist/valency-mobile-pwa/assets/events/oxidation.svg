@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e0a0e"/>
+      <stop offset="55%" stop-color="#2c1014"/>
+      <stop offset="100%" stop-color="#140c1f"/>
+    </linearGradient>
+    <radialGradient id="core" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#fed7aa"/>
+      <stop offset="55%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <!-- Fractured outer valence shell -->
+  <circle cx="94" cy="84" r="46" fill="none" stroke="#fb923c" stroke-width="2.4" stroke-dasharray="16 8 10 10" opacity="0.78"/>
+  <circle cx="94" cy="84" r="28" fill="none" stroke="#fdba74" stroke-width="1.4" opacity="0.5"/>
+  <!-- Oxidized Atom Nucleus -->
+  <circle cx="94" cy="84" r="18" fill="url(#core)" stroke="#fff7ed" stroke-width="2"/>
+  <!-- Electrons being ripped away to the right -->
+  <g stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <path d="M126 52 Q162 34 202 30" fill="none"/>
+    <path d="M138 82 Q174 78 214 76" fill="none"/>
+    <path d="M124 114 Q162 126 204 132" fill="none"/>
+  </g>
+  <g fill="#7dd3fc" stroke="#ffffff" stroke-width="1.6">
+    <circle cx="204" cy="30" r="6.5"/>
+    <circle cx="214" cy="76" r="7"/>
+    <circle cx="204" cy="132" r="6.5"/>
+  </g>
+  <!-- Fiery stripping flares -->
+  <g stroke="#f43f5e" stroke-width="2.4" stroke-linecap="round" opacity="0.8">
+    <line x1="132" y1="62" x2="156" y2="52"/>
+    <line x1="142" y1="94" x2="168" y2="96"/>
+    <line x1="128" y1="104" x2="152" y2="112"/>
+  </g>
+</svg>

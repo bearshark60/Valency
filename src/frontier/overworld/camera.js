@@ -1,26 +1,15 @@
-// VALENCY: The Elemental Frontier — World-Space Camera & Projection Adapter
-// Tracks targets strictly in world coordinates and exposes a pluggable Projection Adapter seam
-// so top-down 2D can be replaced by isometric 2D without rewriting world, movement, or camera tracking.
+// VALENCY: The Elemental Frontier — Overworld World-Space Camera & Projection Adapter
+// Tracks targets strictly in world coordinates under window.Valency.Frontier.Overworld
+// and exposes a pluggable Projection Adapter seam for Top-Down 2D and future Isometric 2D.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
   const F = (V.Frontier = V.Frontier || {});
+  const O = (F.Overworld = F.Overworld || {});
 
   const PROJECTIONS = Object.create(null);
 
-  /**
-   * Register a coordinate projection adapter.
-   * Contract:
-   *   {
-   *     id: string,
-   *     label: string,
-   *     worldToScreen(wx, wy, camera) -> { x, y },
-   *     screenToWorld(sx, sy, camera) -> { x, y },
-   *     getVisibleWorldBounds(camera) -> { minX, minY, maxX, maxY },
-   *     clampCameraPosition(cx, cy, camera, world) -> { x, y }
-   *   }
-   */
   function registerProjection(id, adapter) {
     if (!id || !adapter) return;
     PROJECTIONS[id] = adapter;
@@ -34,7 +23,6 @@
     return Object.keys(PROJECTIONS);
   }
 
-  // ===== BUILT-IN ADAPTER 1: TOP-DOWN 2D (ORTHOGRAPHIC) =====
   const TopDownProjection = {
     id: 'topdown',
     label: 'Top-Down 2D',
@@ -91,8 +79,6 @@
     },
   };
 
-  // ===== BUILT-IN ADAPTER 2: ISOMETRIC 2D (2:1 DIMETRIC SEAM FOR FUTURE RENDERER) =====
-  // Demonstrates strict Rendering Independence: same world (x, y) and camera (x, y) project cleanly to 2:1 iso.
   const IsometricProjection = {
     id: 'isometric',
     label: 'Isometric 2D (2:1)',
@@ -141,9 +127,6 @@
   registerProjection('topdown', TopDownProjection);
   registerProjection('isometric', IsometricProjection);
 
-  /**
-   * Create a world-space camera instance.
-   */
   function createCamera(options) {
     const opts = options || {};
     const projectionId = opts.projectionId || 'topdown';
@@ -180,9 +163,6 @@
     return camera;
   }
 
-  /**
-   * Snap camera immediately onto a world coordinate (clamped to world bounds if enabled).
-   */
   function snapTo(camera, targetX, targetY, world) {
     if (!camera) return camera;
     const clamped = camera.projection.clampCameraPosition(targetX, targetY, camera, world);
@@ -191,9 +171,6 @@
     return camera;
   }
 
-  /**
-   * Smoothly follow a world-space target with frame-rate-independent exponential damping.
-   */
   function updateCamera(camera, targetX, targetY, dtSeconds, world) {
     if (!camera) return camera;
     const dt = Math.max(0, Number(dtSeconds) || 0);
@@ -210,7 +187,6 @@
     const nextY = camera.y + (desired.y - camera.y) * alpha;
     const clamped = camera.projection.clampCameraPosition(nextX, nextY, camera, world);
 
-    // Snap sub-pixel tail cleanly
     camera.x = Math.abs(clamped.x - desired.x) < 0.05 ? desired.x : clamped.x;
     camera.y = Math.abs(clamped.y - desired.y) < 0.05 ? desired.y : clamped.y;
     return camera;
@@ -228,7 +204,7 @@
     return camera.projection.getVisibleWorldBounds(camera);
   }
 
-  F.Camera = {
+  O.Camera = {
     TopDownProjection,
     IsometricProjection,
     registerProjection,

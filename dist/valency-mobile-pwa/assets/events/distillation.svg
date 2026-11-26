@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c1527"/>
+      <stop offset="100%" stop-color="#172038"/>
+    </linearGradient>
+    <radialGradient id="amberHeat" cx="25%" cy="74%" r="36%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bluePure" cx="78%" cy="76%" r="36%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="240" height="160" fill="url(#bg)"/>
+  <rect width="240" height="160" fill="url(#amberHeat)"/>
+  <rect width="240" height="160" fill="url(#bluePure)"/>
+  <!-- Boiling round flask (left) -->
+  <circle cx="56" cy="112" r="28" fill="rgba(251,191,36,0.22)" stroke="#e2e8f0" stroke-width="2.2"/>
+  <path d="M31 118 A26 26 0 0 0 81 118 Z" fill="#f59e0b" opacity="0.78"/>
+  <rect x="49" y="54" width="14" height="32" fill="rgba(255,255,255,0.08)" stroke="#e2e8f0" stroke-width="2"/>
+  <!-- Glass condenser tube & spiral coil -->
+  <path d="M56 54 Q56 30 82 32 L166 56 Q184 62 184 82" fill="none" stroke="#cbd5e1" stroke-width="10" stroke-linecap="round" opacity="0.25"/>
+  <path d="M56 54 Q56 30 82 32 L166 56 Q184 62 184 82" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linecap="round"/>
+  <!-- Spiral cooling lines -->
+  <g stroke="#7dd3fc" stroke-width="1.6" fill="none" opacity="0.85">
+    <ellipse cx="104" cy="38" rx="4" ry="8" transform="rotate(16 104 38)"/>
+    <ellipse cx="122" cy="43" rx="4" ry="8" transform="rotate(16 122 43)"/>
+    <ellipse cx="140" cy="48" rx="4" ry="8" transform="rotate(16 140 48)"/>
+    <ellipse cx="158" cy="53" rx="4" ry="8" transform="rotate(16 158 53)"/>
+  </g>
+  <!-- Pure sapphire droplet falling -->
+  <path d="M184 90 C184 90 179 98 179 101 A5 5 0 1 0 189 101 C189 98 184 90 184 90Z" fill="#38bdf8" stroke="#e0f2fe" stroke-width="1"/>
+  <!-- Collection beaker (right) -->
+  <path d="M158 106 L210 106 L206 138 C206 142 202 145 196 145 L172 145 C166 145 162 142 162 138 Z"
+        fill="rgba(56,189,248,0.16)" stroke="#e2e8f0" stroke-width="2.2"/>
+  <path d="M161 124 L207 124 L205 138 C205 141 201 143 196 143 L172 143 C167 143 163 141 163 138 Z"
+        fill="#38bdf8" opacity="0.85"/>
+</svg>

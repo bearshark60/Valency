@@ -1,9 +1,10 @@
-// VALENCY — Zero-Dependency Local Desktop Server (with HTTP Range support for audio)
+// VALENCY — Zero-Dependency Local Mobile & Desktop Pilot Server (with HTTP Range support for iOS Safari audio)
 'use strict';
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8080);
@@ -13,6 +14,7 @@ const MIME = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
@@ -47,7 +49,7 @@ const server = http.createServer((req, res) => {
     const total = stat.size;
     const range = req.headers.range;
 
-    // Support HTTP Byte Ranges for smooth <audio> seeking
+    // Support HTTP Byte Ranges (required by iPhone Safari for <audio> playback!)
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
       const start = parseInt(parts[0], 10);
@@ -77,10 +79,31 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log('\n================================================');
-  console.log('  VALENCY — Local Desktop Server Running');
-  console.log('================================================');
-  console.log(`  Open in browser: http://localhost:${PORT}/`);
+function getLanAddresses() {
+  const nets = os.networkInterfaces();
+  const out = [];
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name] || []) {
+      if (net.family === 'IPv4' && !net.internal) {
+        out.push(net.address);
+      }
+    }
+  }
+  return out;
+}
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log('\n=======================================================');
+  console.log('  VALENCY — iPhone & Desktop Local Pilot Server Running');
+  console.log('=======================================================');
+  console.log(`  Desktop (this PC): http://localhost:${PORT}/index.html`);
+  console.log(`  Mobile  (this PC): http://localhost:${PORT}/mobile.html`);
+  const ips = getLanAddresses();
+  if (ips.length > 0) {
+    console.log('\n  Open on iPhone Safari (same Wi-Fi):');
+    for (const ip of ips) {
+      console.log(`    -> http://${ip}:${PORT}/mobile.html`);
+    }
+  }
   console.log('\n  Press Ctrl+C to stop the server.\n');
 });

@@ -1,11 +1,11 @@
-// VALENCY: The Elemental Frontier — Decoupled Desktop Keyboard Input Provider
-// Translates WASD & Arrow keys into a clean 2D digital intent vector.
-// Zero physics or rendering logic; clears cleanly on blur/disable/exit.
+// VALENCY: The Elemental Frontier — Overworld Desktop Keyboard Input Provider
+// Translates WASD & Arrow keys into a 2D digital intent vector under window.Valency.Frontier.Overworld.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
   const F = (V.Frontier = V.Frontier || {});
+  const O = (F.Overworld = F.Overworld || {});
 
   const KEY_BINDINGS = {
     KeyW: 'up',
@@ -134,7 +134,6 @@
       reset: clearHeld,
       getVector,
       isEnabled: () => enabled,
-      // Expose test/programmatic helpers
       _setKeyForTest(code, pressed) {
         if (!KEY_BINDINGS[code]) return;
         if (pressed) heldCodes.add(code);
@@ -144,7 +143,7 @@
     };
   }
 
-  F.KeyboardInput = {
+  O.KeyboardInput = {
     KEY_BINDINGS,
     createKeyboardInput,
   };
