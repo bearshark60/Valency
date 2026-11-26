@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="src/styles/theme-tokens.css" />
   <link rel="stylesheet" href="src/styles/main.css" />
   <link rel="stylesheet" href="src/styles/character-portrait.css" />
+  <link rel="stylesheet" href="src/styles/frontier-overworld.css" />
 </head>
 <body>
   <!-- ===== HOME MENU SCREEN ===== -->
@@ -70,6 +71,7 @@
         <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
         <button id="menu-btn-gallery" class="ctrl-btn">Event Art (18)</button>
         <button id="menu-btn-char-studio" class="ctrl-btn" title="Open live 2D Animated Portrait Studio (Frontier vs. Institute)">🎭 Character Animation Studio</button>
+        <button id="menu-btn-frontier-overworld" class="ctrl-btn" title="Open Decoupled Frontier Top-Down Overworld Prototype">🗺 Overworld Prototype</button>
         <button id="menu-btn-rules" class="ctrl-btn">Quick Rules</button>
         <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
         <button id="menu-btn-pick-music" class="ctrl-btn" title="Test any local audio file immediately">📁 Pick Track</button>
@@ -219,6 +221,9 @@
   <!-- Pass & Play Curtain -->
   <div id="curtain-root" class="curtain-backdrop hidden"></div>
 
+  <!-- Decoupled Frontier Overworld Movement Prototype Shell -->
+  <div id="frontier-screen" class="frontier-screen hidden"></div>
+
   <!-- Core Scripts (Zero-build, works over file:// and HTTP) -->
   <script src="src/data/cards.js"></script>
   <script src="src/data/compounds.js"></script>
@@ -254,5 +259,13 @@
   <script src="src/ui/storyUI.js"></script>
   <script src="src/ui/frontierUI.js"></script>
   <script src="src/ui/app.js"></script>
+  <!-- Decoupled Frontier Top-Down Overworld Movement Prototype -->
+  <script src="src/frontier/overworld/world.js"></script>
+  <script src="src/frontier/overworld/player.js"></script>
+  <script src="src/frontier/overworld/movement.js"></script>
+  <script src="src/frontier/overworld/camera.js"></script>
+  <script src="src/frontier/overworld/inputKeyboard.js"></script>
+  <script src="src/frontier/overworld/topDownRenderer.js"></script>
+  <script src="src/frontier/overworld/frontier.js"></script>
 </body>
 </html>
