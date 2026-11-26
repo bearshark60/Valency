@@ -36,7 +36,6 @@ const FRONTIER_SCRIPTS = [
   'src/frontier/movement.js',
   'src/frontier/camera.js',
   'src/frontier/inputKeyboard.js',
-  'src/frontier/inputJoystick.js',
   'src/frontier/topDownRenderer.js',
   'src/frontier/frontier.js',
 ];
@@ -124,7 +123,7 @@ test('Movement Kinematics: all 8 directions work and diagonal speed equals cardi
     approxEqual(dist, refDist, 1e-4, `Distance in direction ${c.dir} must match cardinal distance`);
   }
 
-  // Verify combined keyboard + joystick never exceeds speed 1.0
+  // Verify combined input sources never exceed unit speed
   const combined = F.Movement.combineInputVectors([
     { x: 1, y: 1 },
     { x: 0.9, y: 0.9 },
@@ -158,7 +157,6 @@ test('Collision & Boundaries: clamps to edges, blocks rect/circle colliders, sli
   const pRect = F.Player.createPlayer({ x: lab.x + lab.width + 26, y: lab.y + 80, radius: r });
   const startY = pRect.y;
   for (let i = 0; i < 45; i++) {
-    // Push diagonally West + South into right wall of building
     F.Movement.stepPlayerMovement(pRect, { x: -1, y: 1 }, 1 / 60, world);
   }
   assert.ok(pRect.x >= lab.x + lab.width + r - 1e-4, 'Player must not penetrate Field Lab HQ');
@@ -186,29 +184,26 @@ test('Camera & Rendering Independence: player-centered tracking, viewport clampi
   const world = F.World.createTestWorld();
   const viewports = [
     { name: 'Desktop 1280x800', w: 1280, h: 800 },
-    { name: 'Mobile 390x844', w: 390, h: 844 },
-    { name: 'Mobile 320x568', w: 320, h: 568 },
+    { name: 'Desktop 1920x1080', w: 1920, h: 1080 },
   ];
 
   for (const vp of viewports) {
     const cam = F.Camera.createCamera({ x: 960, y: 640, viewportWidth: vp.w, viewportHeight: vp.h, followSmoothing: 10 });
-    // Center of world: camera centers directly on player
     F.Camera.snapTo(cam, 960, 640, world);
     const centerScreen = F.Camera.worldToScreen(cam, 960, 640);
     approxEqual(centerScreen.x, vp.w / 2, 1e-6, `${vp.name} player centered X`);
     approxEqual(centerScreen.y, vp.h / 2, 1e-6, `${vp.name} player centered Y`);
 
-    // Corner clamp: camera never exposes outside world bounds
     F.Camera.snapTo(cam, 20, 20, world);
     const vis = F.Camera.getVisibleWorldBounds(cam);
     assert.ok(vis.minX >= -1e-6 && vis.minY >= -1e-6, `${vp.name} camera must clamp to top-left world bounds`);
 
-    // Smooth tracking convergence
     F.Camera.snapTo(cam, 960, 640, world);
     for (let i = 0; i < 120; i++) {
       F.Camera.updateCamera(cam, 1120, 720, 1 / 60, world);
     }
-    approxEqual(cam.x, 1120, 0.2, `${vp.name} camera converged X`);
+    const expectedX = vp.w >= world.width ? world.width / 2 : 1120;
+    approxEqual(cam.x, expectedX, 0.2, `${vp.name} camera converged X`);
     approxEqual(cam.y, 720, 0.2, `${vp.name} camera converged Y`);
   }
 
@@ -245,8 +240,8 @@ test('Camera & Rendering Independence: player-centered tracking, viewport clampi
   assert.strictEqual(pTop.facingDir, pIso.facingDir);
 });
 
-// ===== TEST 5: DECOUPLED KEYBOARD & VIRTUAL JOYSTICK INPUT MODULES =====
-test('Decoupled Inputs: keyboard key cancellation/reset and virtual joystick analog clamping', () => {
+// ===== TEST 5: DECOUPLED DESKTOP KEYBOARD INPUT MODULE =====
+test('Decoupled Keyboard Input: 8-way vector output, opposite-key cancellation, and clean disable reset', () => {
   const kb = F.KeyboardInput.createKeyboardInput({ target: null });
   kb.enable();
   kb._setKeyForTest('KeyD', true);
@@ -260,23 +255,10 @@ test('Decoupled Inputs: keyboard key cancellation/reset and virtual joystick ana
   // Disable clears held state
   kb.disable();
   assert.deepStrictEqual({ ...kb.getVector() }, { x: 0, y: 0, active: false });
-
-  // Virtual joystick pure math checks
-  const jDead = F.VirtualJoystick.computeJoystickState(2, 1, 42, 0.08);
-  assert.strictEqual(jDead.active, false);
-  assert.strictEqual(jDead.magnitude, 0);
-
-  const jMid = F.VirtualJoystick.computeJoystickState(21, 0, 42, 0.08);
-  assert.strictEqual(jMid.active, true);
-  assert.ok(jMid.x > 0.4 && jMid.x < 0.55, `Expected smooth partial analog value, got ${jMid.x}`);
-
-  const jFar = F.VirtualJoystick.computeJoystickState(120, 120, 42, 0.08);
-  approxEqual(Math.hypot(jFar.x, jFar.y), 1.0, 1e-9, 'Out-of-radius joystick drag clamps to unit circle');
-  approxEqual(Math.hypot(jFar.knobX, jFar.knobY), 42, 1e-9, 'Visual knob clamps to maxRadius');
 });
 
 // ===== TEST 6: NON-DESTRUCTIVE index.html WIRING AUDIT =====
-test('index.html Integration: preserves all existing scripts/buttons and wires Frontier cleanly as independent layer', () => {
+test('index.html Integration: preserves all existing scripts/buttons and wires desktop Frontier cleanly', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
   // Existing menu buttons & core containers preserved
@@ -284,10 +266,11 @@ test('index.html Integration: preserves all existing scripts/buttons and wires F
     assert.ok(html.includes(`id="${id}"`), `Existing DOM ID #${id} must remain intact`);
   }
 
-  // New Frontier elements present
+  // New Frontier elements present and mobile joystick script removed
   assert.ok(html.includes('href="src/styles/frontier.css"'), 'frontier.css must be linked');
   assert.ok(html.includes('id="menu-btn-frontier"'), '#menu-btn-frontier CTA must exist');
   assert.ok(html.includes('id="frontier-screen"'), '#frontier-screen container must exist');
+  assert.ok(!html.includes('inputJoystick.js'), 'Mobile joystick script must not be loaded');
 
   // Script order: app.js loads before Frontier modules, and Frontier scripts are in dependency order
   const appIdx = html.indexOf('src/ui/app.js');

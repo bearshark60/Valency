@@ -14,7 +14,7 @@
   const STOP_SPEED_EPSILON = 1.5;
 
   /**
-   * Normalize a raw 2D input vector (keyboard digital or joystick analog).
+   * Normalize a raw 2D input vector (e.g., digital keyboard or analog controller).
    * - Applies radial deadzone and smoothly remaps [deadzone, 1] -> [0, 1].
    * - Clamps length to <= 1.0 so diagonal keyboard vectors (1, 1) normalize to (~0.7071, ~0.7071)
    *   and never exceed cardinal movement speed.
@@ -45,8 +45,7 @@
   }
 
   /**
-   * Combine multiple independent input providers (e.g., desktop keyboard + mobile virtual joystick)
-   * into one normalized movement vector bounded to unit magnitude.
+   * Combine multiple independent input providers into one normalized movement vector bounded to unit magnitude.
    */
   function combineInputVectors(vectors, deadzone) {
     if (!Array.isArray(vectors) || vectors.length === 0) {

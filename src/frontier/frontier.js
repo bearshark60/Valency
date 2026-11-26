@@ -1,5 +1,5 @@
-// VALENCY: The Elemental Frontier — Overworld Prototype Orchestrator
-// Independent layer managing Frontier lifecycle, fixed/RAF simulation loop, decoupled input providers,
+// VALENCY: The Elemental Frontier — Overworld Prototype Orchestrator (Desktop)
+// Independent layer managing Frontier lifecycle, simulation loop, keyboard input,
 // world-space camera tracking, swappable renderer, and clean entry/exit without touching Story Mode or card battles.
 
 (function (global) {
@@ -17,7 +17,6 @@
   let camera = null;
   let renderer = null;
   let keyboard = null;
-  let joystick = null;
   let resizeObserver = null;
 
   let elScreen = null;
@@ -25,34 +24,6 @@
   let elCanvas = null;
   let elCoordsReadout = null;
   let elDirReadout = null;
-  let elBtnJoystickToggle = null;
-  let elControlsHint = null;
-  let joystickManualOverride = null; // null = auto, true/false = manual toggle
-
-  function isTouchOrCompactViewport() {
-    if (typeof window === 'undefined') return false;
-    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    const hasTouch = 'ontouchstart' in window || (navigator && navigator.maxTouchPoints > 0);
-    const narrow = window.innerWidth <= 900;
-    return Boolean(coarse || hasTouch || narrow);
-  }
-
-  function syncJoystickVisibility() {
-    if (!joystick) return;
-    const shouldShow = joystickManualOverride !== null
-      ? joystickManualOverride
-      : isTouchOrCompactViewport();
-    joystick.setVisible(shouldShow);
-    if (elBtnJoystickToggle) {
-      elBtnJoystickToggle.textContent = shouldShow ? '🕹 Stick: On' : '🕹 Stick: Off';
-      elBtnJoystickToggle.setAttribute('aria-pressed', String(shouldShow));
-    }
-    if (elControlsHint) {
-      elControlsHint.textContent = shouldShow
-        ? 'Drag thumbstick or use WASD / Arrows to explore'
-        : 'Move: WASD / Arrow Keys • Esc: Menu';
-    }
-  }
 
   function handleResize() {
     if (!elCanvasWrap || !renderer || !camera) return;
@@ -61,7 +32,6 @@
     const h = Math.max(1, Math.floor(rect.height || window.innerHeight || 600));
     renderer.resize(w, h);
     F.Camera.setViewport(camera, w, h, world);
-    syncJoystickVisibility();
     if (active) {
       renderer.render(world, player, camera);
     }
@@ -86,7 +56,6 @@
 
     const inputSources = [];
     if (keyboard) inputSources.push(keyboard.getVector());
-    if (joystick) inputSources.push(joystick.getVector());
     if (externalInput) inputSources.push(externalInput);
 
     const combined = F.Movement.combineInputVectors(inputSources);
@@ -132,7 +101,6 @@
           </div>
         </div>
         <div class="frontier-top-right">
-          <button id="frontier-btn-joystick" class="ctrl-btn frontier-ctrl-btn" type="button" title="Toggle virtual touch joystick">🕹 Stick</button>
           <button id="frontier-btn-reset" class="ctrl-btn frontier-ctrl-btn" type="button" title="Reset scientist to courtyard spawn">↺ Spawn</button>
         </div>
       </header>
@@ -151,8 +119,6 @@
     elCanvas = elScreen.querySelector('#frontier-canvas');
     elCoordsReadout = elScreen.querySelector('#frontier-coords');
     elDirReadout = elScreen.querySelector('#frontier-dir');
-    elBtnJoystickToggle = elScreen.querySelector('#frontier-btn-joystick');
-    elControlsHint = elScreen.querySelector('#frontier-controls-hint');
 
     const btnExit = elScreen.querySelector('#frontier-btn-exit');
     const btnReset = elScreen.querySelector('#frontier-btn-reset');
@@ -168,14 +134,6 @@
       btnReset.addEventListener('click', () => {
         if (V.Sound && V.Sound.playButtonClick) V.Sound.playButtonClick();
         resetPosition();
-      });
-    }
-
-    if (elBtnJoystickToggle) {
-      elBtnJoystickToggle.addEventListener('click', () => {
-        const currentlyVisible = joystick ? joystick.isVisible() : false;
-        joystickManualOverride = !currentlyVisible;
-        syncJoystickVisibility();
       });
     }
 
@@ -199,14 +157,11 @@
     // Swappable presentation renderer
     renderer = F.TopDownRenderer.createTopDownRenderer(elCanvas);
 
-    // Decoupled input providers
+    // Decoupled desktop keyboard input provider
     keyboard = F.KeyboardInput.createKeyboardInput({
       onEscape: () => {
         if (active) exitFrontier();
       },
-    });
-    joystick = F.VirtualJoystick.createVirtualJoystick(elCanvasWrap, {
-      deadzone: 0.08,
     });
 
     window.addEventListener('resize', handleResize);
@@ -251,8 +206,6 @@
     handleResize();
     F.Camera.snapTo(camera, player.x, player.y, world);
     keyboard.enable();
-    joystick.enable();
-    syncJoystickVisibility();
     updateHudReadout();
     renderer.render(world, player, camera);
 
@@ -276,7 +229,6 @@
     lastTimestamp = 0;
 
     if (keyboard) keyboard.disable();
-    if (joystick) joystick.disable();
 
     document.body.classList.remove('frontier-active');
     if (elScreen) elScreen.classList.add('hidden');
@@ -300,8 +252,6 @@
       rendererId: renderer ? renderer.id : null,
       projectionId: camera ? camera.projectionId : null,
       keyboard: keyboard ? keyboard.getVector() : { x: 0, y: 0, active: false },
-      joystick: joystick ? joystick.getVector() : { x: 0, y: 0, magnitude: 0, active: false },
-      joystickVisible: joystick ? joystick.isVisible() : false,
     };
   }
 
@@ -333,5 +283,5 @@
   F.resetPosition = resetPosition;
   F.stepSimulation = stepSimulation;
   F.getState = getState;
-  F._getInputsForTest = () => ({ keyboard, joystick });
+  F._getInputsForTest = () => ({ keyboard });
 })(typeof window !== 'undefined' ? window : globalThis);
