@@ -1,0 +1,139 @@
+/* VALENCY: The Elemental Frontier — Independent Desktop Overworld Stylesheet
+ * Scoped strictly to #frontier-screen so existing card battle, Story, and Stage 3B Frontier UI stay untouched.
+ */
+
+/* Lock page scroll cleanly while Frontier overworld is open */
+body.frontier-active {
+  overflow: hidden;
+}
+
+/* ===== FULL-SCREEN FRONTIER OVERWORLD SHELL ===== */
+.frontier-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: #070d18;
+  color: #f1f5f9;
+  overflow: hidden;
+  user-select: none;
+}
+
+.frontier-screen.hidden {
+  display: none;
+}
+
+/* Top HUD Bar */
+.frontier-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(11, 18, 32, 0.94);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.28);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.frontier-top-left,
+.frontier-top-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.frontier-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.frontier-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #5eead4;
+  white-space: nowrap;
+}
+
+.frontier-zone-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.frontier-exit-btn,
+.frontier-ctrl-btn {
+  min-height: 34px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Canvas Viewport Wrapper */
+.frontier-canvas-wrap {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.frontier-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Compact Telemetry Chip (Bottom-Right) */
+.frontier-hud-telemetry {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.84);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  color: #cbd5e1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 4;
+  backdrop-filter: blur(4px);
+}
+
+.frontier-hud-sep {
+  color: rgba(148, 163, 184, 0.45);
+}
+
+/* Desktop Controls Hint (Bottom-Center) */
+.frontier-controls-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(11, 18, 32, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
