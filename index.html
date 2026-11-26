@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="src/styles/theme-tokens.css" />
   <link rel="stylesheet" href="src/styles/main.css" />
   <link rel="stylesheet" href="src/styles/character-portrait.css" />
+  <link rel="stylesheet" href="src/styles/molecular-formation.css" />
 </head>
 <body>
   <!-- ===== HOME MENU SCREEN ===== -->
@@ -70,6 +71,7 @@
         <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
         <button id="menu-btn-gallery" class="ctrl-btn">Event Art (18)</button>
         <button id="menu-btn-char-studio" class="ctrl-btn" title="Open live 2D Animated Portrait Studio (Frontier vs. Institute)">🎭 Character Animation Studio</button>
+        <button id="menu-btn-formation-lab" class="ctrl-btn" title="Preview Chemistry-Driven Molecular Formation Animations">⚛ Formation Lab</button>
         <button id="menu-btn-rules" class="ctrl-btn">Quick Rules</button>
         <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
         <button id="menu-btn-pick-music" class="ctrl-btn" title="Test any local audio file immediately">📁 Pick Track</button>
@@ -222,6 +224,7 @@
   <!-- Core Scripts (Zero-build, works over file:// and HTTP) -->
   <script src="src/data/cards.js"></script>
   <script src="src/data/compounds.js"></script>
+  <script src="src/data/chemicalIdentity.js"></script>
   <script src="src/engine/gameEngine.js"></script>
   <!-- Story Mode & Historical Scientist Architecture (Modular, Zero Engine Duplication) -->
   <script src="src/story/scientists.js"></script>
@@ -246,6 +249,8 @@
   <script src="src/presentation/characterSvgRegistry.js"></script>
   <script src="src/presentation/characterRigEngine.js"></script>
   <script src="src/presentation/characterRegistry.js"></script>
+  <script src="src/presentation/formationChoreography.js"></script>
+  <script src="src/presentation/battleFormationBridge.js"></script>
   <!-- Configurable AI & UI Controllers -->
   <script src="src/engine/ai.js"></script>
   <script src="src/ui/sound.js"></script>

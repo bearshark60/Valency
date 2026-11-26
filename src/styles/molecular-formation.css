@@ -1,0 +1,402 @@
+/* VALENCY — Molecular Formation Animation System Styles
+ * Scoped strictly to `.mol-formation-*` and `.mol-lab-*` classes.
+ * GPU-composited transitions, responsive desktop + mobile safe areas, and reduced-motion compliance.
+ */
+
+.mol-formation-root {
+  position: fixed;
+  inset: 0;
+  z-index: 115;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.24s ease;
+}
+
+.mol-formation-root.hidden {
+  display: none;
+}
+
+.mol-formation-root.mol-formation-exit {
+  opacity: 0;
+}
+
+.mol-formation-card {
+  pointer-events: auto;
+  width: min(460px, 94vw);
+  background: linear-gradient(165deg, rgba(16, 25, 38, 0.96), rgba(9, 14, 22, 0.98));
+  border: 1.5px solid rgba(56, 189, 248, 0.56);
+  border-radius: 18px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.68), 0 0 34px rgba(56, 189, 248, 0.22);
+  padding: 12px 14px 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--v-text-primary, #f8fafc);
+  font-family: var(--v-font-sans, 'Segoe UI', system-ui, sans-serif);
+  contain: layout style paint;
+  will-change: transform, opacity;
+  animation: molFormationEnter 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.mol-formation-card.mol-card-ionic {
+  border-color: rgba(250, 204, 21, 0.62);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.7), 0 0 34px rgba(250, 204, 21, 0.2);
+}
+
+.mol-formation-card.mol-tone-takeover {
+  border-color: rgba(192, 132, 252, 0.72);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.72), 0 0 36px rgba(168, 85, 247, 0.28);
+}
+
+@keyframes molFormationEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.mol-formation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mol-formation-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.mol-formation-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mol-formation-pill {
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.mol-card-ionic .mol-formation-pill {
+  color: #fde047;
+  background: rgba(250, 204, 21, 0.14);
+  border-color: rgba(250, 204, 21, 0.45);
+}
+
+.mol-formation-sp {
+  font-size: 10.5px;
+  font-weight: 900;
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.42);
+  padding: 1.5px 7px;
+  border-radius: 999px;
+}
+
+.mol-formation-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.mol-formation-formula {
+  font-size: 20px;
+  font-weight: 900;
+  color: #f8fafc;
+  letter-spacing: 0.02em;
+}
+
+.mol-formation-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.mol-formation-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mol-ctrl-btn {
+  appearance: none;
+  background: rgba(30, 41, 59, 0.92);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 9px;
+  padding: 5px 9px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.mol-ctrl-btn:hover {
+  background: rgba(51, 65, 85, 0.96);
+  border-color: rgba(56, 189, 248, 0.65);
+}
+
+.mol-ctrl-skip {
+  color: #7dd3fc;
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.mol-formation-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 360 / 220;
+  background: radial-gradient(circle at 50% 48%, rgba(30, 41, 59, 0.72), rgba(9, 14, 23, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 13px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mol-formation-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mol-formation-svg text {
+  font-family: var(--v-font-sans, 'Segoe UI', system-ui, sans-serif);
+  user-select: none;
+}
+
+.mol-formation-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mol-formation-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mol-meta-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.mol-meta-phase {
+  color: #5eead4;
+  border-color: rgba(45, 212, 191, 0.35);
+  margin-left: auto;
+}
+
+.mol-formation-caption {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: #94a3b8;
+}
+
+/* ===== MOLECULAR FORMATION LAB MODAL ===== */
+.mol-lab-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mol-lab-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 7px;
+}
+
+.mol-lab-tab {
+  appearance: none;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 11px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  cursor: pointer;
+  color: #e2e8f0;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.mol-lab-tab strong {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.mol-lab-tab span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.mol-lab-tab.active,
+.mol-lab-tab:hover {
+  border-color: rgba(56, 189, 248, 0.72);
+  background: rgba(30, 41, 59, 0.94);
+}
+
+.mol-lab-stage-card {
+  background: rgba(11, 18, 30, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.mol-lab-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mol-lab-phase-pill {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #5eead4;
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.36);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.mol-lab-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mol-lab-canvas {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  aspect-ratio: 360 / 220;
+  background: radial-gradient(circle at 50% 48%, rgba(30, 41, 59, 0.7), rgba(9, 14, 23, 0.95));
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.mol-lab-summary {
+  margin: 0;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  text-align: center;
+}
+
+.mol-lab-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.mol-spec-box {
+  background: rgba(15, 23, 42, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mol-spec-box span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  font-weight: 800;
+}
+
+.mol-spec-box strong {
+  font-size: 12px;
+  color: #f8fafc;
+}
+
+/* ===== MOBILE RESPONSIVE TUNING ===== */
+@media (max-width: 640px), (max-height: 600px) {
+  .mol-formation-root {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .mol-formation-card {
+    width: min(370px, 95vw);
+    padding: 9px 11px 10px;
+    gap: 6px;
+    border-radius: 15px;
+  }
+
+  .mol-formation-formula {
+    font-size: 17px;
+  }
+
+  .mol-formation-name {
+    font-size: 12px;
+  }
+
+  .mol-ctrl-btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .mol-meta-phase {
+    margin-left: 0;
+  }
+
+  .mol-formation-caption {
+    font-size: 11px;
+  }
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+@media (prefers-reduced-motion: reduce) {
+  .mol-formation-card {
+    animation: none !important;
+  }
+  .mol-formation-root {
+    transition: none !important;
+  }
+}
+
+body.fx-reduced .mol-formation-card {
+  animation: none !important;
+}

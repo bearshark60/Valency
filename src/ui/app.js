@@ -97,6 +97,9 @@
   function showMenuScreen() {
     clearAITimer();
     clearOpponentRig();
+    if (V.BattleFormation && typeof V.BattleFormation.cancelActive === 'function') {
+      V.BattleFormation.cancelActive();
+    }
     activeTutorialIndex = null;
     lessonDoneAnnounced = false;
     activeStoryMission = null;
@@ -2317,6 +2320,13 @@
     if (V.Sound) { V.Sound.unlockAudio(); V.Sound.playButtonClick(); }
     if (V.FrontierUI && V.FrontierUI.openPortraitPrototypeStudio) {
       V.FrontierUI.openPortraitPrototypeStudio({ origin: 'menu' });
+    }
+  });
+  const menuFormationLab = document.getElementById('menu-btn-formation-lab');
+  if (menuFormationLab) menuFormationLab.addEventListener('click', () => {
+    if (V.Sound) { V.Sound.unlockAudio(); V.Sound.playButtonClick(); }
+    if (V.BattleFormation && V.BattleFormation.openFormationLabModal) {
+      V.BattleFormation.openFormationLabModal();
     }
   });
   const menuMusic = document.getElementById('menu-btn-music');
