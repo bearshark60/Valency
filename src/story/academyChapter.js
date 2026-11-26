@@ -36,17 +36,17 @@
           {
             speaker: 'Academy Registrar',
             portraitRef: 'proctor',
-            text: 'Candidate, your lab bench has been initialized with a standard 120-card Academy reagent deck. Every simulation operates under identical legal rules—no hidden advantages, no extra cards.',
+            text: 'Our simulation chambers recreate landmark scientific methods as benchmark examiners—Lavoisier for conservation, Mendeleev for periodic structure, Pauling for electronegativity, and Curie for persistence. Each uses the exact same 120-card Academy deck and legal rules as you—no hidden advantages.',
           },
           {
             speaker: 'Academy Registrar',
             portraitRef: 'proctor',
-            text: 'Alongside ordinary Stability Point (SP) scoring, the Licensure Board evaluates four competencies: Synthesis, Stability Management, Defensive Control, and Tactical Execution.',
+            text: 'Alongside ordinary 25 SP victory scoring, the Licensure Board grades four competencies: Synthesis, Stability Management, Defensive Control, and Tactical Execution.',
           },
           {
             speaker: 'Academy Registrar',
             portraitRef: 'proctor',
-            text: 'Defeat each Historical Simulation to unlock its Stage One Research Archive entry. Complete its optional Research Challenge to earn Stage Two eligibility for future specialist systems. Report to Chamber 1: Antoine Lavoisier.',
+            text: 'Defeat each simulation to unlock its Stage One Research Archive entry (biography, historical discoveries, and exam record). Complete its optional Research Challenge during the same match to record Stage Two eligibility for future specialist systems. Report to Chamber 1: Antoine Lavoisier.',
           },
         ],
         briefing: {
@@ -72,6 +72,7 @@
         briefing: {
           objective: 'Defeat the Lavoisier Simulation by reaching 25 SP while maintaining clean, waste-free compound synthesis.',
           tacticalTip: 'Lavoisier favors efficient 2–3 card syntheses and protects his bench with Buffers & Distillation. Build steady real compounds and avoid letting Unstable compounds collapse.',
+          licensureFocus: ['Synthesis Competency', 'Stability Management'],
         },
       },
 
@@ -87,10 +88,11 @@
         opponentConfigId: 'opp_mendeleev',
         researchChallengeId: 'rc_mendeleev',
         introduction:
-          'Chamber 2 evaluates your command of periodic group valence patterns against the Dmitri Mendeleev Research Simulation.',
+          'Chamber 2 evaluates your command of periodic group valence patterns against the Dmitri Mendeleev Research Simulation. Rather than relying on isolated formulas, candidates must combine diverse periodic families into high-stability structures.',
         briefing: {
-          objective: 'Defeat the Mendeleev Simulation by leveraging multi-group valence combinations and defending high-SP pillar compounds.',
-          tacticalTip: 'Mendeleev builds high-SP structured compounds and shields them quickly. Keep Ionization Surge or Fluorine ready if he locks down a 16-SP pillar.',
+          objective: 'Defeat the Mendeleev Simulation by reaching 25 SP using thoughtful multi-group element selection and structured high-SP synthesis.',
+          tacticalTip: 'Mendeleev builds high-SP structured pillars (CO₂, CH₄, AlCl₃, MgCl₂) and shields them quickly. Combine multiple periodic groups (1A, 2A, 4A, 6A, 7A) and keep Ionization Surge or Fluorine ready.',
+          licensureFocus: ['Synthesis Competency', 'Stability Management', 'Defensive Competency'],
         },
       },
 
@@ -106,10 +108,11 @@
         opponentConfigId: 'opp_pauling',
         researchChallengeId: 'rc_pauling',
         introduction:
-          'Chamber 3 tests your structural defense and tactical displacement awareness against the Linus Pauling Research Simulation.',
+          'Chamber 3 tests chemical bonding awareness, electronegativity differentials, and tactical disruption against the Linus Pauling Research Simulation. Every unshielded bond on your bench is an opportunity for displacement.',
         briefing: {
-          objective: 'Defeat the Pauling Simulation while safeguarding vulnerable bonds and capitalizing on electronegativity differentials.',
-          tacticalTip: 'Pauling aggressively hunts Electronegativity Takeovers and strips shields with Ionization Surge. Prioritize Light Noble Gases (He/Ne/Ar) on your top compounds!',
+          objective: 'Defeat the Pauling Simulation by reaching 25 SP while protecting high-value bonds and seizing Electronegativity Takeover or Phase 3 tactical openings.',
+          tacticalTip: 'Pauling hunts Electronegativity Takeovers first and strips shields with Ionization Surge. Prioritize Light Noble Gases (He/Ne/Ar—Fluorine-proof!) on your top compounds and watch for your own high-EN takeovers.',
+          licensureFocus: ['Tactical Competency', 'Defensive Competency'],
         },
       },
 
@@ -118,17 +121,18 @@
         order: 5,
         type: 'examination',
         title: 'Curie – The Research Practicum',
-        subtitle: 'Chamber 4 • Persistence, Reclamation & Decay Pressure',
+        subtitle: 'Chamber 4 • Scientific Investigation, Persistence & Reclamation',
         prerequisites: ['ch0_m4_pauling'],
         nextMissionIds: ['ch0_m6_final_exam'],
         scientistId: 'curie',
         opponentConfigId: 'opp_curie',
         researchChallengeId: 'rc_curie',
         introduction:
-          'Chamber 4 measures laboratory persistence under continuous disruption against the Marie Curie Research Simulation (operating strictly on standard legal Academy reagents).',
+          'Chamber 4 honors Marie Curie’s pioneering research in radioactivity and element isolation through an investigation-focused practicum. Operating strictly on standard legal Academy cards (no invented radioactive mechanics), the simulation tests empirical persistence, discard reclamation, and composure under disruption.',
         briefing: {
-          objective: 'Defeat the Curie Simulation while maintaining stability through reclamation, decay pressure, and disciplined defense.',
-          tacticalTip: 'Curie leverages Distillation, Half-Life Decay, and Buffer Solution persistently. Use Equilibrium Shift to rescue halved compounds and deploy Buffer Solution before big turns.',
+          objective: 'Defeat the Curie Simulation by reaching 25 SP while maintaining zero unstable collapses and executing disciplined Phase 3 tactical and defensive responses.',
+          tacticalTip: 'Curie relentlessly leverages Distillation, Half-Life Decay, Buffer Solution, and experimental unstable staging—all using standard legal cards. Use Equilibrium Shift to rescue halved compounds and time Buffer Solution ahead of key turns.',
+          licensureFocus: ['Stability Management', 'Defensive Competency', 'Tactical Competency'],
         },
       },
 
@@ -137,7 +141,7 @@
         order: 6,
         type: 'examination',
         title: 'Final Examination – The Licensure Trial',
-        subtitle: 'Chamber 5 • Full Licensure Board & The Instability Anomaly',
+        subtitle: 'Chamber 5 • Comprehensive Competency Board & The Frontier Anomaly',
         prerequisites: ['ch0_m5_curie'],
         nextMissionIds: ['ch1_m1_frontier_arrival'], // Reserved hook for Chapter 1: The Frontier
         scientistId: null,
@@ -147,40 +151,58 @@
         opponentDisplayName: 'Academy Licensure Proctor',
         opponentPortraitRef: 'proctor',
         introduction:
-          'All four historical simulations are complete. One final trial remains before the Academy confers your official License—yet emergency telemetry is already flashing from outside the walls.',
+          'All four historical simulations are complete. The Final Examination integrates conservation, periodic structure, electronegativity tactics, and empirical persistence into one comprehensive trial—just as urgent telemetry arrives from outlying research stations.',
         dialogue: [
           {
             speaker: 'Academy Proctor',
             portraitRef: 'proctor',
-            text: 'Candidate, welcome to the Licensure Trial. This adaptive simulation integrates conservation, periodic structure, electronegativity tactics, and persistence.',
+            text: 'Candidate, welcome to the Licensure Trial. This comprehensive simulation draws upon every discipline tested in Chambers 1 through 4, operating on the same legal 120-card Academy deck.',
           },
           {
             speaker: 'Academy Proctor',
             portraitRef: 'proctor',
-            text: 'Before we begin, note an urgent anomaly flagged on the Frontier sensors: stable compounds in outlying laboratories are spontaneously shifting into unstable states without catalysts or external reagents.',
+            text: 'Before we begin, the Board has declassified an urgent alert from Frontier monitoring stations: previously stable compounds are spontaneously destabilizing without catalysts, acid attack, or electronegativity displacement.',
           },
           {
             speaker: 'Academy Proctor',
             portraitRef: 'proctor',
-            text: 'Pass this Final Examination to earn your Provisional, Standard, or Honors Licensure—and receive clearance to investigate the Molecular Instability Mystery in Chapter 1: The Frontier.',
+            text: 'Win this examination to certify your Academy License—Provisional, Standard, or Honors based on your cumulative competency record—and earn clearance for Chapter 1: The Frontier. A perfect score is not required to graduate.',
           },
         ],
         briefing: {
-          objective: 'Defeat the Academy Licensure Proctor to earn your official Academy License and unlock Chapter 1: The Frontier.',
-          tacticalTip: 'Demonstrate all four competencies—clean Synthesis, zero Unstable collapses, active Defense (Shield/Buffer), and sharp Phase 3 Tactics—for Honors Licensure!',
+          objective: 'Defeat the Academy Licensure Proctor (25 SP) to certify your cumulative Academy License (Provisional, Standard, or Honors) and unlock Chapter 1: The Frontier.',
+          tacticalTip: 'Any victory certifies your Academy License! Combine steady synthesis, zero unstable collapses, active shielding/buffers, and Phase 3 tactics to maximize your cumulative Honors standing.',
+          licensureFocus: ['Synthesis Competency', 'Stability Management', 'Defensive Competency', 'Tactical Competency'],
         },
         postVictoryDialogue: [
           {
             speaker: 'Academy Proctor',
             portraitRef: 'proctor',
-            text: 'Examination concluded. Your competency scores have been ratified by the Academy Licensure Board.',
+            text: 'Examination concluded. The Academy Licensure Board has reviewed both today’s trial and your cumulative record across Lavoisier, Mendeleev, Pauling, and Curie.',
           },
           {
             speaker: 'Academy Proctor',
             portraitRef: 'proctor',
-            text: 'Effective immediately, you are assigned to the Frontier Telemetry Desk. The Molecular Instability Mystery is spreading across outer laboratories—Chapter 1: The Frontier awaits.',
+            text: 'Effective immediately, you are cleared for Frontier field deployment. New sensor logs confirm the unexplained Molecular Instability Anomaly is accelerating across outer laboratories—Chapter 1: The Frontier awaits.',
           },
         ],
+        postDefeatDialogue: [
+          {
+            speaker: 'Academy Proctor',
+            portraitRef: 'proctor',
+            text: 'The Licensure Board requires a match victory to ratify your Academy License, though your prior Chamber certifications remain permanently preserved.',
+          },
+          {
+            speaker: 'Academy Proctor',
+            portraitRef: 'proctor',
+            text: 'Review your four competency scores below, adjust your balance between Synthesis and Phase 3 Defense, and return to the Licensure Trial when ready.',
+          },
+        ],
+        frontierAnomalyBriefing: {
+          title: 'Declassified Dispatch — The Molecular Instability Anomaly',
+          summary:
+            'Outlying Frontier laboratories report fully bonded, octet-complete molecules spontaneously reverting into unstable states without catalysts or external electronegativity displacement. As a newly licensed Academy chemist, your next assignment in Chapter 1: The Frontier will investigate the cause.',
+        },
       },
     ],
   };

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>VALENCY Mobile — Chemistry Card Game</title>
+
+  <!-- iPhone Safari Full-Screen Web App / PWA Meta -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="VALENCY" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#10151b" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/valency-icon-180.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/valency-icon-192.png" />
+
+  <link rel="stylesheet" href="src/styles/theme-tokens.css" />
+  <link rel="stylesheet" href="src/styles/main.css" />
+  <link rel="stylesheet" href="src/styles/character-portrait.css" />
+  <link rel="stylesheet" href="src/styles/mobile.css" />
+</head>
+<body class="valency-mobile">
+  <!-- ===== MOBILE HOME MENU SCREEN ===== -->
+  <div id="menu-screen" class="menu-screen">
+    <div class="menu-card">
+      <div class="menu-hero">
+        <div id="menu-atom-logo" class="menu-atom-logo" aria-hidden="true"></div>
+        <div class="mobile-edition-pill">iPHONE &amp; MOBILE PILOT EDITION</div>
+        <h1 class="menu-title">VALENCY</h1>
+        <p class="menu-tagline">Combine real elements, defend with Noble Gases, and steal bonds via Electronegativity. First to <strong>25 SP</strong> wins.</p>
+        <button id="menu-audio-prompt" class="menu-audio-prompt hidden" type="button">🎵 Tap to start music</button>
+      </div>
+
+      <div class="menu-primary-actions">
+        <button id="menu-btn-story" class="menu-cta menu-cta-story">
+          <span class="menu-cta-icon">📖</span>
+          <span class="menu-cta-text">
+            <strong>Story Mode: Academy Licensure</strong>
+            <small>Chapter 0 • Historical Scientist Simulations &amp; Archive</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-frontier" class="menu-cta menu-cta-frontier">
+          <span class="menu-cta-icon">🧭</span>
+          <span class="menu-cta-text">
+            <strong>Chapter 1: The Elemental Frontier</strong>
+            <small>Sector 01 • Exploration, Expeditions &amp; Scientist Lab</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-ai" class="menu-cta menu-cta-primary">
+          <span class="menu-cta-icon">⚛</span>
+          <span class="menu-cta-text">
+            <strong>Classic Match vs. Dr. Mendeleev</strong>
+            <small>Solo match • 120-card Unit 1 deck</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-pvp" class="menu-cta menu-cta-secondary">
+          <span class="menu-cta-icon">🧪</span>
+          <span class="menu-cta-text">
+            <strong>2-Player Pass &amp; Play</strong>
+            <small>Pass the iPhone with hidden hand curtain</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-tutorial" class="menu-cta menu-cta-tutorial">
+          <span class="menu-cta-icon">🎓</span>
+          <span class="menu-cta-text">
+            <strong>Interactive Tutorial</strong>
+            <small>7 guided hands-on lessons on the live table</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+      </div>
+
+      <div class="menu-utility-row">
+        <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
+        <button id="menu-btn-gallery" class="ctrl-btn">Event Art</button>
+        <button id="menu-btn-char-studio" class="ctrl-btn">🎭 Character Animation Studio</button>
+        <button id="menu-btn-rules" class="ctrl-btn">Rules</button>
+        <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
+        <button id="menu-btn-sfx" class="ctrl-btn">🔊 SFX: On</button>
+        <button id="menu-btn-audio-settings" class="ctrl-btn">🎛 Audio</button>
+        <button id="menu-btn-fx" class="ctrl-btn">✨ FX: On</button>
+        <button id="menu-btn-pick-music" class="ctrl-btn hidden" aria-hidden="true">📁</button>
+        <input id="menu-music-file" type="file" accept="audio/*" class="hidden" />
+      </div>
+
+      <div id="ios-install-tip" class="ios-install-tip">
+        <span>📱</span>
+        <span><strong>iPhone Tip:</strong> Tap Safari's <strong>Share</strong> button → <strong>Add to Home Screen</strong> to play full-screen like a native app!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Music Elements (preload="none" on mobile so cellular/iPhone loads instantaneously!) -->
+  <audio id="bgm-menu" loop preload="none">
+    <source src="assets/audio/menu-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/menu-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/menu-theme.wav" type="audio/wav" />
+    <source src="assets/audio/menu-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-vs_ai" loop preload="none">
+    <source src="assets/audio/ai-battle-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/ai-battle-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/ai-battle-theme.wav" type="audio/wav" />
+    <source src="assets/audio/ai-battle-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-pass_and_play" loop preload="none">
+    <source src="assets/audio/pvp-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/pvp-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/pvp-theme.wav" type="audio/wav" />
+    <source src="assets/audio/pvp-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-tutorial" loop preload="none">
+    <source src="assets/audio/tutorial-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/tutorial-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/tutorial-theme.wav" type="audio/wav" />
+    <source src="assets/audio/tutorial-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-scientist-lavoisier" loop preload="none">
+    <source src="assets/audio/lavoisier-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/lavoisier-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/lavoisier-theme.wav" type="audio/wav" />
+    <source src="assets/audio/lavoisier-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-scientist-mendeleev" loop preload="none">
+    <source src="assets/audio/mendeleev-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/mendeleev-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/mendeleev-theme.wav" type="audio/wav" />
+    <source src="assets/audio/mendeleev-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-scientist-pauling" loop preload="none">
+    <source src="assets/audio/pauling-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/pauling-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/pauling-theme.wav" type="audio/wav" />
+    <source src="assets/audio/pauling-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-scientist-curie" loop preload="none">
+    <source src="assets/audio/curie-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/curie-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/curie-theme.wav" type="audio/wav" />
+    <source src="assets/audio/curie-theme.ogg" type="audio/ogg" />
+  </audio>
+  <audio id="bgm-scientist-proctor" loop preload="none">
+    <source src="assets/audio/final-exam-theme.m4a" type="audio/mp4" />
+    <source src="assets/audio/final-exam-theme.mp3" type="audio/mpeg" />
+    <source src="assets/audio/final-exam-theme.wav" type="audio/wav" />
+    <source src="assets/audio/final-exam-theme.ogg" type="audio/ogg" />
+  </audio>
+
+  <!-- ===== ACTIVE MOBILE MATCH INTERFACE ===== -->
+  <div id="app" class="app-shell hidden">
+    <!-- Compact iPhone Safe-Area Top Header -->
+    <header class="topbar mobile-topbar">
+      <div class="mobile-top-left">
+        <button id="btn-back-menu" class="ctrl-btn mobile-icon-btn" title="Main Menu" aria-label="Main Menu">←</button>
+        <div id="turn-banner" class="turn-banner mobile-turn-banner"></div>
+      </div>
+
+      <div class="mobile-top-right">
+        <button id="btn-mobile-hints" class="ctrl-btn mobile-pill-btn" title="Open Recipe Hints">
+          💡 <span id="mobile-hints-badge" class="pill-count">0</span>
+        </button>
+        <button id="btn-mobile-log" class="ctrl-btn mobile-icon-btn" title="Reaction Log" aria-label="Reaction Log">📜</button>
+        <button id="btn-mobile-more" class="ctrl-btn mobile-icon-btn" title="Match Menu" aria-label="Match Menu">⋯</button>
+        <!-- Hidden desktop toggle kept for seamless app.js binding -->
+        <button id="btn-sidebar-toggle" class="hidden" aria-hidden="true"></button>
+      </div>
+    </header>
+
+    <!-- Mobile "More" Action Sheet (Holds standard app.js controls for zero duplicate wiring) -->
+    <div id="mobile-more-backdrop" class="mobile-sheet-backdrop hidden">
+      <div class="mobile-more-sheet" role="dialog" aria-label="Match Options">
+        <div class="mobile-sheet-handle"></div>
+        <div class="mobile-sheet-header">
+          <strong>Lab Controls &amp; Reference</strong>
+          <button id="btn-mobile-more-close" class="ctrl-btn">Done</button>
+        </div>
+        <div class="mobile-more-grid">
+          <button id="btn-periodic" class="ctrl-btn mobile-sheet-btn">🧪 Periodic Table</button>
+          <button id="btn-rules" class="ctrl-btn mobile-sheet-btn">📖 Quick Rules</button>
+          <button id="btn-music-toggle" class="ctrl-btn mobile-sheet-btn">🎵 Music</button>
+          <button id="btn-sfx-toggle" class="ctrl-btn mobile-sheet-btn">🔊 SFX</button>
+          <button id="btn-audio-settings" class="ctrl-btn mobile-sheet-btn">🎛 Audio Mixer</button>
+          <button id="btn-fx-toggle" class="ctrl-btn mobile-sheet-btn">✨ Visual FX</button>
+          <button id="btn-concede" class="ctrl-btn mobile-sheet-btn mobile-btn-danger">🏳 Concede</button>
+          <button id="btn-new-game" class="ctrl-btn ctrl-btn-primary mobile-sheet-btn mobile-sheet-span2">↻ Restart Match</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Mobile Workspace -->
+    <div id="main-layout" class="main-layout mobile-main-layout">
+      <main class="table-area mobile-table-area">
+        <!-- Interactive Tutorial Coach Banner -->
+        <section id="tutorial-banner" class="tutorial-banner hidden"></section>
+
+        <!-- Opponent Zone (Compact Strip + Horizontal Field Scroll) -->
+        <section id="opponent-zone" class="player-zone opponent-zone"></section>
+
+        <!-- Center Bench: Compact Draw/Discard + Thumb Action Bar -->
+        <section id="center-bench" class="center-bench"></section>
+
+        <!-- Bottom Player Zone: Field + Horizontal Swipe Hand -->
+        <section id="player-zone" class="player-zone bottom-zone"></section>
+      </main>
+
+      <!-- Slide-Up Drawer Backdrop -->
+      <div id="mobile-drawer-backdrop" class="mobile-sheet-backdrop hidden"></div>
+
+      <!-- Slide-Up Drawer (Reuses canonical #sidebar / #recipe-hints / #reaction-log IDs!) -->
+      <aside id="sidebar" class="sidebar mobile-drawer">
+        <div class="sidebar-panel sidebar-tabbed mobile-drawer-panel">
+          <div class="mobile-sheet-handle"></div>
+          <div class="mobile-drawer-top">
+            <div class="sidebar-tabs">
+              <button id="tab-hints" class="sidebar-tab active">
+                💡 Hints <span id="recipe-count" class="pill-count">0</span>
+              </button>
+              <button id="tab-log" class="sidebar-tab">
+                📜 Log
+              </button>
+            </div>
+            <button id="btn-mobile-drawer-close" class="ctrl-btn mobile-drawer-close" aria-label="Close drawer">✕</button>
+          </div>
+
+          <div id="pane-hints" class="tab-pane">
+            <div id="recipe-hints" class="recipe-hints"></div>
+          </div>
+
+          <div id="pane-log" class="tab-pane hidden">
+            <div id="reaction-log" class="reaction-log"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Non-blocking Reaction & Atomic FX Layer -->
+  <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+
+  <!-- Pre-Match Chemist Profile VS Intro Overlay -->
+  <div id="intro-root" class="intro-backdrop hidden"></div>
+
+  <!-- 2-Second Opponent Card Play Showcase Overlay -->
+  <div id="showcase-root" class="showcase-backdrop hidden"></div>
+
+  <!-- Modal Backdrop -->
+  <div id="modal-root" class="modal-backdrop hidden"></div>
+
+  <!-- Pass & Play Curtain -->
+  <div id="curtain-root" class="curtain-backdrop hidden"></div>
+
+  <!-- Shared Canonical Rules Engine, Story Mode, AI, and UI + Mobile Touch Shell -->
+  <script src="src/data/cards.js"></script>
+  <script src="src/data/compounds.js"></script>
+  <script src="src/engine/gameEngine.js"></script>
+  <script src="src/story/scientists.js"></script>
+  <script src="src/story/scientistCardSchema.js"></script>
+  <script src="src/story/opponentConfigs.js"></script>
+  <script src="src/story/evaluation.js"></script>
+  <script src="src/story/researchChallenges.js"></script>
+  <script src="src/story/progression.js"></script>
+  <script src="src/story/academyChapter.js"></script>
+  <script src="src/frontier/playerProfile.js"></script>
+  <script src="src/frontier/collectionManager.js"></script>
+  <script src="src/frontier/scientistEquipment.js"></script>
+  <script src="src/frontier/worldManager.js"></script>
+  <script src="src/frontier/rewardProcessor.js"></script>
+  <script src="src/frontier/expeditionManager.js"></script>
+  <script src="src/frontier/investigationManager.js"></script>
+  <script src="src/frontier/encounterManager.js"></script>
+  <script src="src/presentation/visualTheme.js"></script>
+  <script src="src/presentation/audioConfig.js"></script>
+  <script src="src/presentation/characterSvgRegistry.js"></script>
+  <script src="src/presentation/characterRigEngine.js"></script>
+  <script src="src/presentation/characterRegistry.js"></script>
+  <script src="src/engine/ai.js"></script>
+  <script src="src/ui/sound.js"></script>
+  <script src="src/ui/animations.js"></script>
+  <script src="src/ui/tutorial.js"></script>
+  <script src="src/ui/storyUI.js"></script>
+  <script src="src/ui/frontierUI.js"></script>
+  <script src="src/ui/app.js"></script>
+  <script src="src/ui/mobileShell.js"></script>
+</body>
+</html>

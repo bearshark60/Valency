@@ -16,6 +16,46 @@
   let lessonDoneAnnounced = false;
   let activeStoryMission = null;
   let storyTelemetryTracker = null;
+  let activeFrontierEncounterId = null;
+  let activeOpponentRig = null;
+  let activeOpponentExpression = 'neutral';
+  let oppExpressionResetTimer = null;
+  let battleReactionState = {
+    battleStartTs: 0,
+    lastReactionTs: 0,
+    lastReactionExpr: 'neutral',
+    lastGlitchTs: 0,
+    prevPlayerSP: 0,
+    prevOppSP: 0,
+  };
+
+  function resetBattleReactionState() {
+    battleReactionState = {
+      battleStartTs: Date.now(),
+      lastReactionTs: 0,
+      lastReactionExpr: 'neutral',
+      lastGlitchTs: 0,
+      prevPlayerSP: 0,
+      prevOppSP: 0,
+    };
+  }
+
+  function clearOpponentRig() {
+    if (oppExpressionResetTimer) {
+      clearTimeout(oppExpressionResetTimer);
+      oppExpressionResetTimer = null;
+    }
+    if (activeOpponentRig) {
+      const container = activeOpponentRig.container;
+      activeOpponentRig.destroy();
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+      activeOpponentRig = null;
+    }
+    activeOpponentExpression = 'neutral';
+    resetBattleReactionState();
+  }
 
   let currentMode = 'vs_ai';
   let activeSidebarTab = 'hints'; // 'hints' | 'log'
@@ -56,10 +96,12 @@
 
   function showMenuScreen() {
     clearAITimer();
+    clearOpponentRig();
     activeTutorialIndex = null;
     lessonDoneAnnounced = false;
     activeStoryMission = null;
     storyTelemetryTracker = null;
+    activeFrontierEncounterId = null;
     selectedCardIds = [];
     awaitingPassCurtain = false;
     closeModal();
@@ -71,19 +113,26 @@
     }
     if (elAppShell) elAppShell.classList.add('hidden');
     if (elMenuScreen) elMenuScreen.classList.remove('hidden');
-    if (V.Sound && V.Sound.setMusicMode) V.Sound.setMusicMode('menu');
+    if (V.Visual && V.Visual.applyScene) V.Visual.applyScene('main_menu');
+    if (V.Sound && V.Sound.requestScene) V.Sound.requestScene('main_menu');
+    else if (V.Sound && V.Sound.setMusicMode) V.Sound.setMusicMode('menu');
     syncPreferenceButtons();
   }
 
-  function showMatchScreen(musicMode) {
+  function showMatchScreen(musicMode, visualScene) {
     if (elMenuScreen) elMenuScreen.classList.add('hidden');
     if (elAppShell) elAppShell.classList.remove('hidden');
-    if (V.Sound && V.Sound.setMusicMode) V.Sound.setMusicMode(musicMode || currentMode || 'vs_ai');
+    const targetVisual = visualScene || (musicMode === 'tutorial' ? 'tutorial' : 'classic_battle');
+    if (V.Visual && V.Visual.applyScene) V.Visual.applyScene(targetVisual);
+    const targetAudio = musicMode || currentMode || 'classic_ai';
+    if (V.Sound && V.Sound.requestScene) V.Sound.requestScene(targetAudio);
+    else if (V.Sound && V.Sound.setMusicMode) V.Sound.setMusicMode(targetAudio);
     syncPreferenceButtons();
   }
 
   function startNewGame(mode) {
     clearAITimer();
+    clearOpponentRig();
     currentMode = mode || currentMode || 'vs_ai';
     selectedCardIds = [];
     statusMessage = '';
@@ -93,6 +142,7 @@
     lessonDoneAnnounced = false;
     activeStoryMission = null;
     storyTelemetryTracker = null;
+    activeFrontierEncounterId = null;
     closeModal();
     hideCurtain();
     showMatchScreen(currentMode);
@@ -120,6 +170,7 @@
   function startStoryEncounter(mission) {
     if (!mission || !V.Story) return;
     clearAITimer();
+    clearOpponentRig();
     currentMode = 'vs_ai';
     selectedCardIds = [];
     statusMessage = '';
@@ -129,16 +180,22 @@
     lessonDoneAnnounced = false;
     activeStoryMission = mission;
     storyTelemetryTracker = V.Story.createTelemetryTracker();
+    activeFrontierEncounterId = null;
     const sci = mission.scientistId ? V.Story.getScientistProfile(mission.scientistId) : null;
     const oppCfg = V.Story.getOpponentConfig(mission.opponentConfigId);
     const storyMusicMode = (sci && sci.musicThemeRef) || 'scientist_proctor';
     closeModal();
     hideCurtain();
-    showMatchScreen(storyMusicMode);
+    showMatchScreen(storyMusicMode, 'academy_exam');
 
     const opponentName = sci ? sci.displayName : (mission.opponentDisplayName || 'Academy Proctor');
+    const resolvedStoryAnimatedId = V.CharacterRegistry
+      ? V.CharacterRegistry.resolveCharacterId({ storyMissionId: mission.missionId })
+      : null;
     const storyOpponentMeta = {
       portraitRef: sci ? sci.portraitRef : (mission.opponentPortraitRef || 'proctor'),
+      animatedPortraitId: resolvedStoryAnimatedId,
+      storyMissionId: mission.missionId,
       title: oppCfg ? oppCfg.strategyProfile : 'Academy Simulation',
       specialty: sci ? sci.specialty : 'Comprehensive Academy Licensure',
       badge: oppCfg ? `${oppCfg.difficulty} Simulation` : 'Academy Exam',
@@ -161,6 +218,44 @@
         flushFX();
         maybeScheduleAI();
       }, storyOpponentMeta);
+    } else {
+      flushFX();
+      maybeScheduleAI();
+    }
+  }
+
+  function startFrontierEncounter(encounterId) {
+    if (!encounterId || !V.Frontier || !V.Frontier.EncounterManager) return;
+    clearAITimer();
+    clearOpponentRig();
+    currentMode = 'vs_ai';
+    selectedCardIds = [];
+    statusMessage = '';
+    statusTone = 'normal';
+    awaitingPassCurtain = false;
+    activeTutorialIndex = null;
+    lessonDoneAnnounced = false;
+    activeStoryMission = null;
+    storyTelemetryTracker = null;
+    activeFrontierEncounterId = encounterId;
+
+    const profile = V.Frontier.PlayerProfile.loadProfile();
+    const activeExp = V.Frontier.ExpeditionManager.loadActiveExpedition();
+    const init = V.Frontier.EncounterManager.initializeEncounterBattle(profile, activeExp, encounterId);
+    if (!init.ok) return;
+
+    closeModal();
+    hideCurtain();
+    showMatchScreen(init.encounter.musicThemeRef || 'frontier_encounter_standard', 'frontier_encounter');
+
+    state = init.battleState;
+    renderAll(true);
+
+    if (V.playPreMatchIntro) {
+      V.playPreMatchIntro(state.players, state.mode, () => {
+        flushFX();
+        maybeScheduleAI();
+      }, state.storyOpponentMeta);
     } else {
       flushFX();
       maybeScheduleAI();
@@ -270,11 +365,238 @@
   }
 
   // ===== RENDER PIPELINE =====
+  const SEVERE_DISRUPTION_EVENTS = [
+    'ACID_RAIN',
+    'BOND_CLEAVAGE',
+    'EN_TAKEOVER',
+    'ELECTROLYSIS',
+    'PRECIPITATION',
+    'HALF_LIFE_DECAY',
+    'RAPID_OXIDATION',
+    'LIQUID_EMBRITTLEMENT',
+    'CHLORAMINE_HAZARD',
+  ];
+  const TACTICAL_DISRUPTION_EVENTS = ['OXIDATION', 'IONIZATION_SURGE', 'REACTION_DELAY', 'TURN_SKIPPED'];
+
+  /**
+   * Pure Stage 3D.4 presentation-only reaction evaluator.
+   * Translates canonical gameplay events + SP context into a restrained opponent expression
+   * with priority ranking, global cooldowns, same-expression deduplication, and strict
+   * Frontier-only reconstruction instability enforcement. Zero effect on game rules.
+   */
+  function evaluateBattlePortraitReaction(batch, ctx) {
+    const c = ctx || {};
+    const now = typeof c.now === 'number' ? c.now : Date.now();
+    const aiFamily = c.aiFamily || 'FRONTIER';
+    const characterId = c.characterId || '';
+    const isMendeleev = characterId.indexOf('sci_men_') === 0;
+    const manifestObj = c.manifest || (characterId && V.CharacterRig && V.CharacterRig.getCharacterManifest ? V.CharacterRig.getCharacterManifest(characterId) : null);
+    const rxCfg = Object.assign(
+      isMendeleev
+        ? {
+            playerHighSynthMinSP: 14,
+            onPlayerHighSynth: aiFamily === 'INSTITUTE' ? 'thoughtful' : 'concerned',
+            onPlayerMidSynth: 'thoughtful',
+            onPlayerLowSynth: aiFamily === 'FRONTIER' ? 'disappointed' : 'thoughtful',
+            onUnexpectedReaction: 'thoughtful',
+            onOwnShield: 'amused',
+            onOwnHighSynth: 'amused',
+            onOwnStandardSynth: 'explaining',
+          }
+        : {
+            playerHighSynthMinSP: 12,
+            onPlayerHighSynth: 'concerned',
+            onPlayerMidSynth: 'thoughtful',
+            onPlayerLowSynth: 'amused',
+            onUnexpectedReaction: null,
+            onOwnShield: null,
+            onOwnHighSynth: 'amused',
+            onOwnStandardSynth: 'explaining',
+          },
+      (manifestObj && manifestObj.battleReactions) || {},
+      c.battleReactions || {}
+    );
+    const rState = c.reactionState || {
+      battleStartTs: 0,
+      lastReactionTs: 0,
+      lastReactionExpr: 'neutral',
+      lastGlitchTs: 0,
+      prevPlayerSP: 0,
+      prevOppSP: 0,
+    };
+    const p0SP = typeof c.playerSP === 'number' ? c.playerSP : 0;
+    const p1SP = typeof c.oppSP === 'number' ? c.oppSP : 0;
+    const oppSPDrop = Math.max(0, (rState.prevOppSP || 0) - p1SP);
+    const prevLead = (rState.prevPlayerSP || 0) - (rState.prevOppSP || 0);
+    const curLead = p0SP - p1SP;
+
+    const nextState = Object.assign({}, rState, {
+      prevPlayerSP: p0SP,
+      prevOppSP: p1SP,
+    });
+
+    if (!batch || batch.length === 0) {
+      return { action: 'none', nextState };
+    }
+
+    let bestExpr = null;
+    let bestPriority = 0; // 1 = synthesis, 2 = advantage loss, 3 = disruption, 4 = frontier instability
+    let severeHitSP = 0;
+
+    function consider(expr, priority) {
+      if (expr && priority > bestPriority) {
+        bestExpr = expr;
+        bestPriority = priority;
+      }
+    }
+
+    const UNEXPECTED_REACTION_EVENTS = [
+      'HYDROCARBON_SYNERGY',
+      'SALT_CURE',
+      'LUMINESCENCE',
+      'RESONANCE_STABILIZER',
+      'EQUILIBRIUM_SHIFT',
+    ];
+
+    for (const ev of batch) {
+      const m = ev && ev.meta;
+      if (!m) continue;
+      const targetsOpp = m.victimId === 1 || (m.victimId === undefined && m.playerId === 0);
+
+      if (SEVERE_DISRUPTION_EVENTS.includes(m.type) && targetsOpp) {
+        severeHitSP = Math.max(severeHitSP, Number(m.lostSP) || 0);
+        consider(severeHitSP >= 8 ? 'disappointed' : 'irritated', 3);
+      } else if (TACTICAL_DISRUPTION_EVENTS.includes(m.type) && targetsOpp) {
+        consider('concerned', 3);
+      } else if ((m.type === 'UNSTABLE_DECAY' || m.type === 'ASTATINE_DECAY') && m.playerId === 1) {
+        consider('disappointed', 2);
+      } else if (rxCfg.onUnexpectedReaction && UNEXPECTED_REACTION_EVENTS.includes(m.type) && m.playerId === 0) {
+        consider(rxCfg.onUnexpectedReaction, 1);
+      } else if (rxCfg.onOwnShield && m.type === 'SHIELD' && m.playerId === 1) {
+        consider(rxCfg.onOwnShield, 1);
+      } else if ((m.type === 'SYNTHESIZE' || m.type === 'STABILIZE_COMPOUND') && m.playerId === 0) {
+        const sp = Number(m.sp) || 0;
+        const hiMin = Number(rxCfg.playerHighSynthMinSP) || 12;
+        if (sp >= hiMin) consider(rxCfg.onPlayerHighSynth, 1);
+        else if (sp >= 7) consider(rxCfg.onPlayerMidSynth, 1);
+        else consider(rxCfg.onPlayerLowSynth, 1);
+      } else if ((m.type === 'SYNTHESIZE' || m.type === 'STABILIZE_COMPOUND') && m.playerId === 1) {
+        const sp = Number(m.sp) || 0;
+        consider(sp >= 10 ? rxCfg.onOwnHighSynth : rxCfg.onOwnStandardSynth, 1);
+      }
+    }
+
+    // Strategic advantage loss or endgame deficit detection (lost >= 6 SP, lead lost, or player >= 16 SP ahead by >= 6)
+    if (oppSPDrop >= 6 || (curLead >= 6 && prevLead < 6) || (p0SP >= 16 && curLead >= 6)) {
+      consider('disappointed', 2);
+    }
+
+    // Rare Frontier-only reconstruction instability under heavy pressure (strictly 0 on Institute)
+    const heavyFrontierPressure =
+      aiFamily === 'FRONTIER' &&
+      (now - (rState.lastGlitchTs || 0) >= 14000) &&
+      ((oppSPDrop >= 8) || (p0SP >= 16 && curLead >= 6) || (p0SP >= 18 && bestPriority >= 1));
+
+    if (heavyFrontierPressure) {
+      nextState.lastReactionTs = now;
+      nextState.lastReactionExpr = 'instability';
+      nextState.lastGlitchTs = now;
+      return {
+        action: 'react',
+        expression: 'instability',
+        triggerGlitch: true,
+        holdMs: 3000,
+        priority: 4,
+        nextState,
+      };
+    }
+
+    if (!bestExpr) {
+      return { action: 'none', nextState };
+    }
+
+    // Battle-start composed neutral grace window (ignore low-priority chatter during first 1.8s)
+    if (bestPriority < 3 && rState.battleStartTs && now - rState.battleStartTs < 1800) {
+      return { action: 'cooldown', reason: 'battle_start_grace', nextState };
+    }
+
+    // Global cooldown (1.1s for disruptions, 2.2s for synthesis/advantage shifts)
+    const elapsed = now - (rState.lastReactionTs || 0);
+    const minCooldown = bestPriority >= 3 ? 1100 : 2200;
+    if (rState.lastReactionTs > 0 && elapsed < minCooldown) {
+      return { action: 'cooldown', reason: 'global_cooldown', nextState };
+    }
+
+    // Same-expression deduplication (avoid spamming identical expression within 4.5s)
+    if (bestExpr === rState.lastReactionExpr && rState.lastReactionTs > 0 && elapsed < 4500) {
+      return { action: 'cooldown', reason: 'same_expression_dedup', nextState };
+    }
+
+    nextState.lastReactionTs = now;
+    nextState.lastReactionExpr = bestExpr;
+    return {
+      action: 'react',
+      expression: bestExpr,
+      triggerGlitch: false,
+      holdMs: bestPriority >= 3 ? 2900 : (bestPriority === 2 ? 2800 : 2400),
+      priority: bestPriority,
+      nextState,
+    };
+  }
+
+  V.evaluateBattlePortraitReaction = evaluateBattlePortraitReaction;
+
+  function resolveAnimatedOpponentForState() {
+    if (!state || !V.CharacterRig) return null;
+    if (V.CharacterRegistry && typeof V.CharacterRegistry.resolveForBattleState === 'function') {
+      return V.CharacterRegistry.resolveForBattleState(state);
+    }
+    const fallbackId = state.storyOpponentMeta && state.storyOpponentMeta.animatedPortraitId;
+    if (!fallbackId) return null;
+    const manifest = V.CharacterRig.getCharacterManifest(fallbackId);
+    return manifest ? { characterId: fallbackId, manifest } : null;
+  }
+
+  function reactOpponentPortraitToEvents(batch) {
+    if (!activeOpponentRig || !batch || batch.length === 0) return;
+    const p0SP = state && state.players && V.getPlayerSP ? V.getPlayerSP(state.players[0]) : 0;
+    const p1SP = state && state.players && V.getPlayerSP ? V.getPlayerSP(state.players[1]) : 0;
+    const aiFamily = (activeOpponentRig.manifest && activeOpponentRig.manifest.aiFamily) || 'FRONTIER';
+
+    const decision = evaluateBattlePortraitReaction(batch, {
+      now: Date.now(),
+      aiFamily,
+      characterId: activeOpponentRig.characterId || '',
+      manifest: activeOpponentRig.manifest || null,
+      playerSP: p0SP,
+      oppSP: p1SP,
+      reactionState: battleReactionState,
+    });
+    battleReactionState = decision.nextState;
+
+    if (decision.action !== 'react') return;
+
+    activeOpponentExpression = decision.expression;
+    activeOpponentRig.setExpression(decision.expression);
+    if (decision.triggerGlitch) {
+      activeOpponentRig.triggerReconstructionGlitch();
+    }
+
+    if (oppExpressionResetTimer) clearTimeout(oppExpressionResetTimer);
+    oppExpressionResetTimer = setTimeout(() => {
+      activeOpponentExpression = 'neutral';
+      if (activeOpponentRig && !activeOpponentRig.destroyed) {
+        activeOpponentRig.setExpression('neutral');
+      }
+    }, decision.holdMs || 2600);
+  }
+
   function flushFX() {
     if (state && state.recentEvents && state.recentEvents.length > 0) {
       const batch = state.recentEvents.splice(0, state.recentEvents.length);
       if (V.playGameEvents) V.playGameEvents(batch, getViewingPlayerIndex());
       if (V.Sound) V.Sound.playSoundsForEvents(batch);
+      reactOpponentPortraitToEvents(batch);
     }
   }
 
@@ -299,14 +621,26 @@
 
   function renderTopBanner() {
     const active = V.getActivePlayer(state);
-    let phaseLabel = 'Phase 2: Synthesis';
+    const isMobile = typeof document !== 'undefined' && document.body && document.body.classList.contains('valency-mobile');
+    let phaseLabel = isMobile ? 'Synth' : 'Phase 2: Synthesis';
     let phaseClass = 'phase-synthesis';
     if (state.phase === 'DEFENSE') {
-      phaseLabel = 'Phase 3: Defense & Events';
+      phaseLabel = isMobile ? 'Def' : 'Phase 3: Defense & Events';
       phaseClass = 'phase-defense';
     } else if (state.phase === 'GAME_OVER') {
-      phaseLabel = 'Match Complete';
+      phaseLabel = isMobile ? 'Done' : 'Match Complete';
       phaseClass = 'phase-gameover';
+    }
+
+    if (isMobile) {
+      const shortWho = active.id === 0 && state.mode === 'vs_ai'
+        ? 'You'
+        : active.name.replace(/^Simulation:\s*/i, '').split(' ').slice(-1)[0];
+      elTurnBanner.innerHTML = `
+        <span class="mobile-turn-who">T${state.turnNumber}·${escapeHtml(shortWho)}</span>
+        <span class="phase-badge ${phaseClass}">${phaseLabel}</span>
+      `;
+      return;
     }
 
     elTurnBanner.innerHTML = `
@@ -426,6 +760,28 @@
       ${renderFieldRow(topPlayer, targetCtx)}
     `;
 
+    // Mount or persistently re-attach decoupled animated portrait into Opponent Header (ZERO flicker across turns!)
+    const resolvedOpp = resolveAnimatedOpponentForState();
+    const animSlot = document.getElementById('battle-opp-animated-portrait-slot');
+    if (animSlot && resolvedOpp && V.CharacterRig) {
+      if (activeOpponentRig && !activeOpponentRig.destroyed && activeOpponentRig.characterId === resolvedOpp.characterId && activeOpponentRig.container) {
+        animSlot.replaceWith(activeOpponentRig.container);
+      } else {
+        clearOpponentRig();
+        const mountEl = document.createElement('div');
+        mountEl.id = 'battle-opp-animated-portrait';
+        mountEl.title = resolvedOpp.manifest.constructTitle || resolvedOpp.manifest.displayName;
+        animSlot.replaceWith(mountEl);
+        activeOpponentRig = V.CharacterRig.mount(mountEl, {
+          characterId: resolvedOpp.characterId,
+          size: 'mini',
+          expression: activeOpponentExpression || 'neutral',
+        });
+      }
+    } else if (activeOpponentRig) {
+      clearOpponentRig();
+    }
+
     // Bottom (Viewing Player) Zone
     elPlayerZone.className = `player-zone bottom-zone ${state.activePlayerIndex === bottomPlayer.id ? 'active-turn' : ''}`;
     elPlayerZone.innerHTML = `
@@ -538,7 +894,10 @@
       : '';
 
     const profile = V.getProfileMeta ? V.getProfileMeta(player, player.id, state.mode, state.storyOpponentMeta) : null;
-    const avatarHTML = profile && V.renderPortraitSVG ? V.renderPortraitSVG(profile.key, 'mini-avatar') : '';
+    const resolvedOpp = isTop ? resolveAnimatedOpponentForState() : null;
+    const avatarHTML = resolvedOpp
+      ? '<span id="battle-opp-animated-portrait-slot" class="battle-opp-portrait-slot"></span>'
+      : (profile && V.renderPortraitSVG ? V.renderPortraitSVG(profile.key, 'mini-avatar') : '');
 
     return `
       <div class="zone-header">
@@ -915,8 +1274,20 @@
           ? `<button id="btn-play-instant" class="btn-action ${targetCtx.card.kind === 'event' ? 'btn-play-red' : 'btn-play-card'}">Play ${escapeHtml(targetCtx.card.name)}</button>`
           : '';
 
+      const eqSci = active.equippedScientist;
+      const canUseSciActive = Boolean(
+        eqSci &&
+        eqSci.activeAbility &&
+        eqSci.activeUsesRemaining > 0 &&
+        state.discardPile.some((c) => c.kind === 'element' || c.kind === 'noble_gas')
+      );
+      const sciActiveBtn = eqSci && eqSci.activeAbility
+        ? `<button id="btn-sci-active" class="btn-action btn-play-card" ${canUseSciActive ? '' : 'disabled'} title="${escapeHtml(eqSci.activeAbility.description)}">🧬 ${escapeHtml(eqSci.activeAbility.name)} (${eqSci.activeUsesRemaining})</button>`
+        : '';
+
       actionButtonsHTML = `
         ${playInstantBtn}
+        ${sciActiveBtn}
         ${selectedCardIds.length ? '<button id="btn-clear-sel" class="btn-action btn-pass">Deselect</button>' : ''}
         <button id="btn-end-turn" class="btn-action btn-end">End Turn ✓</button>
       `;
@@ -951,6 +1322,20 @@
     if (btnClear) btnClear.addEventListener('click', () => { selectedCardIds = []; setStatus('', 'normal'); renderAll(); });
     const btnPlayInstant = document.getElementById('btn-play-instant');
     if (btnPlayInstant) btnPlayInstant.addEventListener('click', () => handlePlayInstantClick(targetCtx.card));
+    const btnSciActive = document.getElementById('btn-sci-active');
+    if (btnSciActive) {
+      btnSciActive.addEventListener('click', () => {
+        const res = V.activateScientistAbility(state, {});
+        if (!res.ok) {
+          if (V.Sound) V.Sound.playError();
+          setStatus(res.error, 'error');
+        } else {
+          if (V.Sound) V.Sound.playAbility();
+          setStatus('Scientist Active Ability triggered!', 'valid');
+        }
+        renderAll();
+      });
+    }
     const btnDiscard = document.getElementById('btn-inspect-discard');
     if (btnDiscard) btnDiscard.addEventListener('click', openDiscardModal);
   }
@@ -1188,8 +1573,36 @@
     maybeScheduleAI();
   }
 
-  // ===== MODALS =====
-  function openModal(title, bodyHTML, onBind) {
+  // ===== MODALS (With Stage 3C Pre-Modal Visual & Audio Scene Restoration) =====
+  let preModalVisualScene = null;
+  let preModalAudioScene = null;
+  let activeModalCleanup = null;
+
+  function openModal(title, bodyHTML, onBind, options) {
+    const opts = options || {};
+    const wasHidden = elModalRoot.classList.contains('hidden');
+    if (activeModalCleanup) {
+      try { activeModalCleanup(); } catch (_) {}
+      activeModalCleanup = null;
+    }
+    if (wasHidden) {
+      preModalVisualScene = V.Visual && V.Visual.getActiveVisualState
+        ? V.Visual.getActiveVisualState().sceneId
+        : null;
+      preModalAudioScene = V.Sound && V.Sound.getActiveSceneId
+        ? V.Sound.getActiveSceneId()
+        : null;
+    }
+    if (opts.visualScene && V.Visual && V.Visual.applyScene) {
+      V.Visual.applyScene(opts.visualScene);
+    }
+    if (opts.audioScene && V.Sound && V.Sound.requestScene) {
+      V.Sound.requestScene(opts.audioScene);
+    }
+    if (typeof opts.onClose === 'function') {
+      activeModalCleanup = opts.onClose;
+    }
+
     elModalRoot.innerHTML = `
       <div class="modal-box">
         <div class="modal-header">
@@ -1202,13 +1615,26 @@
     elModalRoot.classList.remove('hidden');
     const closeBtn = document.getElementById('modal-close-btn');
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (onBind) onBind(elModalRoot);
+    if (onBind) {
+      const cleanup = onBind(elModalRoot);
+      if (typeof cleanup === 'function') activeModalCleanup = cleanup;
+    }
   }
 
   function closeModal() {
     if (state && state.pendingPrompt) return; // Don't dismiss required game prompts
+    if (activeModalCleanup) {
+      try { activeModalCleanup(); } catch (_) {}
+      activeModalCleanup = null;
+    }
     elModalRoot.classList.add('hidden');
     elModalRoot.innerHTML = '';
+    const restoreVisual = preModalVisualScene || ((!elAppShell || elAppShell.classList.contains('hidden')) ? 'main_menu' : null);
+    const restoreAudio = preModalAudioScene || ((!elAppShell || elAppShell.classList.contains('hidden')) ? 'main_menu' : null);
+    preModalVisualScene = null;
+    preModalAudioScene = null;
+    if (restoreVisual && V.Visual && V.Visual.applyScene) V.Visual.applyScene(restoreVisual);
+    if (restoreAudio && V.Sound && V.Sound.requestScene) V.Sound.requestScene(restoreAudio);
   }
 
   function openENTakeoverPicker(ownerIdx, moves) {
@@ -1379,6 +1805,13 @@
   }
 
   function openVictoryModal() {
+    if (activeFrontierEncounterId && V.FrontierUI) {
+      const encId = activeFrontierEncounterId;
+      activeFrontierEncounterId = null;
+      V.FrontierUI.handleFrontierEncounterComplete(state, encId);
+      return;
+    }
+
     if (activeStoryMission && V.StoryUI) {
       V.StoryUI.handleEncounterComplete(state, activeStoryMission, storyTelemetryTracker);
       return;
@@ -1558,6 +1991,7 @@
     lessonDoneAnnounced = false;
     activeStoryMission = null;
     storyTelemetryTracker = null;
+    activeFrontierEncounterId = null;
 
     const introRoot = document.getElementById('intro-root');
     if (introRoot) {
@@ -1737,6 +2171,118 @@
     syncPreferenceButtons();
   }
 
+  function openAudioSettingsModal() {
+    const mobileMore = document.getElementById('mobile-more-backdrop');
+    if (mobileMore) mobileMore.classList.add('hidden');
+    const settings = V.Sound && V.Sound.getAudioSettings
+      ? V.Sound.getAudioSettings()
+      : { musicEnabled: true, soundEnabled: true, musicVolume: 0.45, sfxVolume: 0.85, fadeDurationMs: 350 };
+    const pb = V.Sound && V.Sound.getPlaybackState ? V.Sound.getPlaybackState() : { sceneId: 'main_menu', state: 'IDLE' };
+    const sceneCfg = V.AudioConfig && pb.sceneId ? V.AudioConfig.getSceneConfig(pb.sceneId) : null;
+    const themePill = V.Visual && V.Visual.renderThemePill ? V.Visual.renderThemePill() : '';
+
+    const musicPct = Math.round((settings.musicVolume || 0) * 100);
+    const sfxPct = Math.round((settings.sfxVolume || 0) * 100);
+    const fadeMs = settings.fadeDurationMs || 350;
+
+    const body = `
+      <div class="v-audio-mixer">
+        <div class="v-audio-row">
+          <div>
+            <strong>Active Audio Scene:</strong>
+            <span style="color:#5eead4;font-weight:700;">${escapeHtml(sceneCfg ? sceneCfg.label : (pb.sceneId || 'None'))}</span>
+            <div style="font-size:11.5px;color:#94a3b8;margin-top:2px;">
+              Status: <code>${escapeHtml(sceneCfg ? sceneCfg.status : pb.state)}</code> • Playback: <code>${escapeHtml(pb.state)}</code>
+            </div>
+          </div>
+          ${themePill}
+        </div>
+
+        <div class="v-audio-row">
+          <label for="audio-music-slider">🎵 Music Volume</label>
+          <input id="audio-music-slider" type="range" min="0" max="100" step="1" value="${musicPct}" />
+          <span id="audio-music-val" class="v-audio-val">${musicPct}%</span>
+          <button id="audio-btn-music-mute" class="ctrl-btn">${settings.musicEnabled ? 'Mute' : 'Unmute'}</button>
+        </div>
+
+        <div class="v-audio-row">
+          <label for="audio-sfx-slider">🔊 SFX Volume</label>
+          <input id="audio-sfx-slider" type="range" min="0" max="100" step="1" value="${sfxPct}" />
+          <span id="audio-sfx-val" class="v-audio-val">${sfxPct}%</span>
+          <button id="audio-btn-sfx-mute" class="ctrl-btn">${settings.soundEnabled ? 'Mute' : 'Unmute'}</button>
+        </div>
+
+        <div class="v-audio-row">
+          <label for="audio-fade-select">🌊 Scene Crossfade</label>
+          <select id="audio-fade-select" class="ctrl-btn" style="flex:1;max-width:220px;">
+            <option value="0" ${fadeMs === 0 ? 'selected' : ''}>Instant (0 ms)</option>
+            <option value="200" ${fadeMs === 200 ? 'selected' : ''}>Fast (200 ms)</option>
+            <option value="350" ${fadeMs === 350 ? 'selected' : ''}>Smooth (350 ms)</option>
+            <option value="600" ${fadeMs === 600 ? 'selected' : ''}>Cinematic (600 ms)</option>
+          </select>
+          <button id="audio-btn-test-sfx" class="ctrl-btn">🔔 Test SFX</button>
+        </div>
+
+        <div style="font-size:11.5px;color:#94a3b8;line-height:1.45;">
+          Preferences save automatically to local storage. Existing menu, Classic AI, tutorial, and Scientist soundtracks are preserved; unassigned Frontier scenes remain silent until dedicated tracks are added to <code>assets/audio/</code> or registered in <code>audioConfig.js</code>.
+        </div>
+      </div>
+    `;
+
+    openModal('🎛 Audio Mixer & Scene Controls', body, (root) => {
+      const mSlider = root.querySelector('#audio-music-slider');
+      const mVal = root.querySelector('#audio-music-val');
+      const mMute = root.querySelector('#audio-btn-music-mute');
+      const sSlider = root.querySelector('#audio-sfx-slider');
+      const sVal = root.querySelector('#audio-sfx-val');
+      const sMute = root.querySelector('#audio-btn-sfx-mute');
+      const fSelect = root.querySelector('#audio-fade-select');
+      const testBtn = root.querySelector('#audio-btn-test-sfx');
+
+      if (mSlider) {
+        mSlider.addEventListener('input', () => {
+          const pct = Number(mSlider.value);
+          if (mVal) mVal.textContent = `${pct}%`;
+          if (V.Sound && V.Sound.setMusicVolume) V.Sound.setMusicVolume(pct / 100);
+        });
+      }
+      if (mMute) {
+        mMute.addEventListener('click', () => {
+          handleToggleMusic();
+          const on = V.Sound && V.Sound.isMusicEnabled ? V.Sound.isMusicEnabled() : true;
+          mMute.textContent = on ? 'Mute' : 'Unmute';
+        });
+      }
+      if (sSlider) {
+        sSlider.addEventListener('input', () => {
+          const pct = Number(sSlider.value);
+          if (sVal) sVal.textContent = `${pct}%`;
+          if (V.Sound && V.Sound.setSfxVolume) V.Sound.setSfxVolume(pct / 100);
+        });
+      }
+      if (sMute) {
+        sMute.addEventListener('click', () => {
+          handleToggleSFX();
+          const on = V.Sound && V.Sound.isSoundEnabled ? V.Sound.isSoundEnabled() : true;
+          sMute.textContent = on ? 'Mute' : 'Unmute';
+        });
+      }
+      if (fSelect) {
+        fSelect.addEventListener('change', () => {
+          if (V.Sound && V.Sound.setFadeDuration) V.Sound.setFadeDuration(Number(fSelect.value));
+        });
+      }
+      if (testBtn) {
+        testBtn.addEventListener('click', () => {
+          if (V.Sound) {
+            V.Sound.unlockAudio();
+            V.Sound.playSynthesize(16);
+          }
+        });
+      }
+    });
+  }
+
   // Render live hero atom emblem on the Menu Screen
   const elMenuLogo = document.getElementById('menu-atom-logo');
   if (elMenuLogo && V.renderAtomSVG && V.ELEMENT_BY_SYMBOL && V.ELEMENT_BY_SYMBOL.C) {
@@ -1748,6 +2294,11 @@
   if (menuStory) menuStory.addEventListener('click', () => {
     if (V.Sound) { V.Sound.unlockAudio(); V.Sound.playButtonClick(); }
     if (V.StoryUI) V.StoryUI.openStoryHub('missions');
+  });
+  const menuFrontier = document.getElementById('menu-btn-frontier');
+  if (menuFrontier) menuFrontier.addEventListener('click', () => {
+    if (V.Sound) { V.Sound.unlockAudio(); V.Sound.playButtonClick(); }
+    if (V.FrontierUI) V.FrontierUI.openFrontierHub('world', '');
   });
   const menuAi = document.getElementById('menu-btn-ai');
   if (menuAi) menuAi.addEventListener('click', () => { if (V.Sound) V.Sound.unlockAudio(); startNewGame('vs_ai'); });
@@ -1761,6 +2312,13 @@
   if (menuGallery) menuGallery.addEventListener('click', openEventGalleryModal);
   const menuRules = document.getElementById('menu-btn-rules');
   if (menuRules) menuRules.addEventListener('click', openRulesModal);
+  const menuCharStudio = document.getElementById('menu-btn-char-studio');
+  if (menuCharStudio) menuCharStudio.addEventListener('click', () => {
+    if (V.Sound) { V.Sound.unlockAudio(); V.Sound.playButtonClick(); }
+    if (V.FrontierUI && V.FrontierUI.openPortraitPrototypeStudio) {
+      V.FrontierUI.openPortraitPrototypeStudio({ origin: 'menu' });
+    }
+  });
   const menuMusic = document.getElementById('menu-btn-music');
   if (menuMusic) menuMusic.addEventListener('click', handleToggleMusic);
   const menuPickMusic = document.getElementById('menu-btn-pick-music');
@@ -1783,6 +2341,11 @@
   }
   const menuSfx = document.getElementById('menu-btn-sfx');
   if (menuSfx) menuSfx.addEventListener('click', handleToggleSFX);
+  const menuAudioSettings = document.getElementById('menu-btn-audio-settings');
+  if (menuAudioSettings) menuAudioSettings.addEventListener('click', () => {
+    if (V.Sound) V.Sound.playButtonClick();
+    openAudioSettingsModal();
+  });
   const menuFx = document.getElementById('menu-btn-fx');
   if (menuFx) menuFx.addEventListener('click', handleToggleFX);
 
@@ -1795,6 +2358,11 @@
   if (btnFxToggle) btnFxToggle.addEventListener('click', handleToggleFX);
   const btnSfxToggle = document.getElementById('btn-sfx-toggle');
   if (btnSfxToggle) btnSfxToggle.addEventListener('click', handleToggleSFX);
+  const btnAudioSettings = document.getElementById('btn-audio-settings');
+  if (btnAudioSettings) btnAudioSettings.addEventListener('click', () => {
+    if (V.Sound) V.Sound.playButtonClick();
+    openAudioSettingsModal();
+  });
   const btnSidebarToggle = document.getElementById('btn-sidebar-toggle');
   if (btnSidebarToggle) btnSidebarToggle.addEventListener('click', toggleSidebar);
   const tabHints = document.getElementById('tab-hints');
@@ -1819,6 +2387,7 @@
   }
   document.getElementById('btn-new-game').addEventListener('click', () => {
     if (activeTutorialIndex !== null) startTutorialLesson(activeTutorialIndex);
+    else if (activeFrontierEncounterId) startFrontierEncounter(activeFrontierEncounterId);
     else if (activeStoryMission) startStoryEncounter(activeStoryMission);
     else startNewGame(currentMode);
   });
@@ -1920,11 +2489,12 @@
   document.addEventListener('pointerdown', hideExpandedTextBox, { passive: true });
   window.addEventListener('scroll', hideExpandedTextBox, { passive: true });
 
-  // Expose clean UI bridge for modular Story Mode controller (storyUI.js)
+  // Expose clean UI bridge for modular Story Mode & Frontier controllers
   V.UI = {
     openModal,
     closeModal,
     startStoryEncounter,
+    startFrontierEncounter,
     showMenuScreen,
   };
 

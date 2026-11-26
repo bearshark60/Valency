@@ -236,6 +236,64 @@
     };
   }
 
+  /**
+   * Compute cumulative Chapter 0 Academy performance across each examination's BEST winning evaluation.
+   * Read-only and 100% compatible with existing schemaVersion 1 saves.
+   */
+  function getChapter0CumulativeSummary(prog) {
+    const p = prog || loadProgression();
+    const examMissionIds = [
+      'ch0_m2_lavoisier',
+      'ch0_m3_mendeleev',
+      'ch0_m4_pauling',
+      'ch0_m5_curie',
+      'ch0_m6_final_exam',
+    ];
+    const scientistIds = ['lavoisier', 'mendeleev', 'pauling', 'curie'];
+    const bestWins = [];
+    const perExam = [];
+
+    for (const mId of examMissionIds) {
+      const rec = p.completedMissions && p.completedMissions[mId];
+      const bestWin =
+        rec && (rec.bestWinningEvaluation || (rec.lastEvaluation && rec.lastEvaluation.won ? rec.lastEvaluation : null));
+      if (bestWin && bestWin.won) {
+        bestWins.push(bestWin);
+      }
+      perExam.push({
+        missionId: mId,
+        cleared: Boolean(rec && rec.completed),
+        bestOverall: rec ? rec.bestOverall || 0 : 0,
+        bestLicensureTier: rec ? rec.bestLicensureTier || 'Not Yet Certified' : 'Not Yet Certified',
+      });
+    }
+
+    const avg = (arr) => (arr.length === 0 ? 0 : Math.round(arr.reduce((s, n) => s + n, 0) / arr.length));
+    const cumulativeOverall = avg(bestWins.map((e) => e.overall || 0));
+    const cumulativeCompetencies = {
+      synthesis: avg(bestWins.map((e) => (e.competencies && e.competencies.synthesis) || 0)),
+      stability: avg(bestWins.map((e) => (e.competencies && e.competencies.stability) || 0)),
+      defensive: avg(bestWins.map((e) => (e.competencies && e.competencies.defensive) || 0)),
+      tactical: avg(bestWins.map((e) => (e.competencies && e.competencies.tactical) || 0)),
+    };
+
+    const stageOneCount = scientistIds.filter((id) => getScientistProgress(p, id).stageOneUnlocked).length;
+    const stageTwoCount = scientistIds.filter((id) => getScientistProgress(p, id).stageTwoUnlocked).length;
+
+    return {
+      examsCleared: bestWins.length,
+      totalExams: examMissionIds.length,
+      cumulativeOverall,
+      cumulativeCompetencies,
+      finalLicensureTier: p.chapter0LicensureTier || 'Not Yet Certified',
+      chapter0Completed: Boolean(p.chapter0Completed),
+      chapter1Unlocked: Boolean(p.chapter1Unlocked),
+      stageOneCount,
+      stageTwoCount,
+      perExam,
+    };
+  }
+
   V.Story = V.Story || {};
   V.Story.STORAGE_KEY = STORAGE_KEY;
   V.Story.loadProgression = loadProgression;
@@ -244,4 +302,5 @@
   V.Story.recordNarrativeMissionComplete = recordNarrativeMissionComplete;
   V.Story.recordExaminationOutcome = recordExaminationOutcome;
   V.Story.getScientistProgress = getScientistProgress;
+  V.Story.getChapter0CumulativeSummary = getChapter0CumulativeSummary;
 })(typeof window !== 'undefined' ? window : globalThis);

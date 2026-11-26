@@ -1,25 +1,44 @@
-// VALENCY — Web Audio API Synthesized Sound Effects Engine
-// Zero external audio files; works 100% offline over file:// and HTTP.
-// Automatically unlocks AudioContext on first user gesture and supports SFX mute toggle.
+// VALENCY — Centralized Modular Audio Manager & Web Audio SFX Engine (Stage 3C)
+// Preserves all existing menu, Classic AI, Tutorial, and Scientist soundtracks untouched.
+// Adds scene-based music routing via V.AudioConfig, smooth configurable crossfades,
+// independent Music/SFX volume sliders, localStorage persistence, and graceful missing-file handling.
 
 (function (global) {
   'use strict';
   const V = (global.Valency = global.Valency || {});
 
+  const AUDIO_SETTINGS_KEY = 'valency_audio_settings_v1';
+  const DEFAULT_SETTINGS = Object.freeze({
+    musicEnabled: true,
+    soundEnabled: true,
+    musicVolume: 0.45,   // 0.0 – 1.0 (0.45 matches legacy menu volume baseline)
+    sfxVolume: 0.85,     // 0.0 – 1.0
+    fadeDurationMs: 350, // Smooth crossfade duration in ms
+  });
+
   let audioCtx = null;
   let noiseBuffer = null;
-  let soundEnabled = true;
-  let musicEnabled = true;
-  let currentMusicMode = null; // 'menu' | 'vs_ai' | 'pass_and_play' | 'tutorial' | null
+  let soundEnabled = DEFAULT_SETTINGS.soundEnabled;
+  let musicEnabled = DEFAULT_SETTINGS.musicEnabled;
+  let musicVolume = DEFAULT_SETTINGS.musicVolume;
+  let sfxVolume = DEFAULT_SETTINGS.sfxVolume;
+  let fadeDurationMs = DEFAULT_SETTINGS.fadeDurationMs;
+
+  let currentMusicMode = null;  // Preserves requested scene/mode identifier
+  let activeSceneId = null;     // Canonical sceneId from V.AudioConfig
+  let activePlaybackState = 'IDLE'; // 'IDLE' | 'HTML_AUDIO' | 'SYNTH' | 'SILENT_UNASSIGNED' | 'AUTOPLAY_BLOCKED' | 'MUTED'
   let activeAudioEl = null;
-  let musicFadeTimer = null;
+  let dynamicAudioPool = {};    // sceneId -> HTMLAudioElement for runtime config/customUrl tracks
   let synthMusicTimer = null;
   let synthStep = 0;
   let userGestureSeen = false;
 
   const BGM_ELEMENT_IDS = {
     menu: 'bgm-menu',
+    main_menu: 'bgm-menu',
+    academy_menu: 'bgm-menu',
     vs_ai: 'bgm-vs_ai',
+    classic_ai: 'bgm-vs_ai',
     pass_and_play: 'bgm-pass_and_play',
     tutorial: 'bgm-tutorial',
     scientist_lavoisier: 'bgm-scientist-lavoisier',
@@ -29,9 +48,114 @@
     scientist_proctor: 'bgm-scientist-proctor',
   };
 
-  function getMusicEl(mode) {
+  function clamp(val, min, max, fallback) {
+    const n = Number(val);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function getStorage() {
+    try {
+      return global.localStorage || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function loadAudioSettings() {
+    const store = getStorage();
+    if (!store) return getAudioSettings();
+    try {
+      const raw = store.getItem(AUDIO_SETTINGS_KEY);
+      if (!raw) return getAudioSettings();
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        if (typeof parsed.musicEnabled === 'boolean') musicEnabled = parsed.musicEnabled;
+        if (typeof parsed.soundEnabled === 'boolean') soundEnabled = parsed.soundEnabled;
+        if (parsed.musicVolume !== undefined) musicVolume = clamp(parsed.musicVolume, 0, 1, DEFAULT_SETTINGS.musicVolume);
+        if (parsed.sfxVolume !== undefined) sfxVolume = clamp(parsed.sfxVolume, 0, 1, DEFAULT_SETTINGS.sfxVolume);
+        if (parsed.fadeDurationMs !== undefined) fadeDurationMs = Math.round(clamp(parsed.fadeDurationMs, 0, 2000, DEFAULT_SETTINGS.fadeDurationMs));
+      }
+    } catch (_) {
+      // Ignore corrupt storage gracefully
+    }
+    return getAudioSettings();
+  }
+
+  function saveAudioSettings() {
+    const snapshot = getAudioSettings();
+    const store = getStorage();
+    if (store) {
+      try {
+        store.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(snapshot));
+      } catch (_) {
+        // Ignore storage quota / private-mode errors
+      }
+    }
+    return snapshot;
+  }
+
+  function getAudioSettings() {
+    return {
+      musicEnabled,
+      soundEnabled,
+      musicVolume,
+      sfxVolume,
+      fadeDurationMs,
+    };
+  }
+
+  function resolveSceneId(modeOrScene) {
+    if (!modeOrScene) return null;
+    if (V.AudioConfig && typeof V.AudioConfig.resolveSceneId === 'function') {
+      return V.AudioConfig.resolveSceneId(modeOrScene);
+    }
+    if (modeOrScene === 'menu') return 'main_menu';
+    if (modeOrScene === 'vs_ai') return 'classic_ai';
+    return modeOrScene;
+  }
+
+  function getSceneConfig(modeOrScene) {
+    const canonical = resolveSceneId(modeOrScene);
+    if (!canonical) return null;
+    if (V.AudioConfig && typeof V.AudioConfig.getSceneConfig === 'function') {
+      return V.AudioConfig.getSceneConfig(canonical);
+    }
+    return {
+      sceneId: canonical,
+      elementId: BGM_ELEMENT_IDS[canonical] || null,
+      synthTrackId: SYNTH_TRACKS[modeOrScene] ? modeOrScene : (SYNTH_TRACKS[canonical] ? canonical : null),
+      defaultVolume: canonical === 'main_menu' ? 0.45 : 0.34,
+      loop: true,
+      silentIfMissing: false,
+    };
+  }
+
+  function computeTargetElVolume(cfg) {
+    const baseDefault = cfg && typeof cfg.defaultVolume === 'number' ? cfg.defaultVolume : 0.45;
+    const relativeScale = baseDefault / 0.45;
+    return clamp(musicVolume * relativeScale, 0, 1, 0.45);
+  }
+
+  function getMusicEl(modeOrScene) {
     if (typeof document === 'undefined') return null;
-    const id = BGM_ELEMENT_IDS[mode || currentMusicMode || 'menu'];
+    const cfg = getSceneConfig(modeOrScene || currentMusicMode || 'main_menu');
+    if (cfg && cfg.customUrl) {
+      let dyn = dynamicAudioPool[cfg.sceneId];
+      if (!dyn && typeof global.Audio === 'function') {
+        dyn = new global.Audio();
+        dynamicAudioPool[cfg.sceneId] = dyn;
+      }
+      if (dyn) {
+        if (dyn.src !== cfg.customUrl) {
+          dyn.src = cfg.customUrl;
+          if (typeof dyn.load === 'function') dyn.load();
+        }
+        dyn.loop = cfg.loop !== false;
+        return dyn;
+      }
+    }
+    const id = (cfg && cfg.elementId) || BGM_ELEMENT_IDS[modeOrScene || currentMusicMode || 'main_menu'];
     return id ? document.getElementById(id) : null;
   }
 
@@ -41,6 +165,68 @@
     if (el) el.classList.toggle('hidden', !visible);
   }
 
+  function clearElementFade(el) {
+    if (el && el._valencyFadeTimer) {
+      clearInterval(el._valencyFadeTimer);
+      el._valencyFadeTimer = null;
+    }
+  }
+
+  function fadeOutAndPause(el, durationMs) {
+    if (!el) return;
+    clearElementFade(el);
+    const dur = durationMs !== undefined ? durationMs : fadeDurationMs;
+    if (el.paused || dur <= 0) {
+      try {
+        el.pause();
+      } catch (_) {}
+      return;
+    }
+    const startVol = typeof el.volume === 'number' ? el.volume : 0.42;
+    const steps = Math.max(4, Math.min(16, Math.round(dur / 30)));
+    const stepMs = Math.max(15, Math.round(dur / steps));
+    let tick = 0;
+    el._valencyFadeTimer = setInterval(() => {
+      tick++;
+      el.volume = Math.max(0, startVol * (1 - tick / steps));
+      if (tick >= steps) {
+        clearElementFade(el);
+        if (el !== activeAudioEl) {
+          try {
+            el.pause();
+          } catch (_) {}
+        }
+      }
+    }, stepMs);
+  }
+
+  function fadeInAudio(el, targetVol, durationMs) {
+    if (!el) return;
+    clearElementFade(el);
+    const dur = durationMs !== undefined ? durationMs : fadeDurationMs;
+    const goal = clamp(targetVol, 0, 1, 0.45);
+    if (dur <= 0 || goal <= 0.001) {
+      el.volume = goal;
+      return;
+    }
+    el.volume = 0;
+    const steps = Math.max(4, Math.min(16, Math.round(dur / 30)));
+    const stepMs = Math.max(15, Math.round(dur / steps));
+    let tick = 0;
+    el._valencyFadeTimer = setInterval(() => {
+      tick++;
+      if (el !== activeAudioEl || !musicEnabled) {
+        clearElementFade(el);
+        return;
+      }
+      el.volume = Math.min(goal, goal * (tick / steps));
+      if (tick >= steps) {
+        el.volume = goal;
+        clearElementFade(el);
+      }
+    }, stepMs);
+  }
+
   function stopSynthMusic() {
     if (synthMusicTimer) {
       clearInterval(synthMusicTimer);
@@ -48,41 +234,37 @@
     }
   }
 
-  function stopAllHtmlAudio(immediate) {
-    if (musicFadeTimer) {
-      clearInterval(musicFadeTimer);
-      musicFadeTimer = null;
-    }
-    if (typeof document === 'undefined') return;
-    for (const id of Object.values(BGM_ELEMENT_IDS)) {
-      const el = document.getElementById(id);
-      if (!el || el.paused) continue;
-      if (immediate) {
-        el.pause();
-        el.volume = 0.42;
-      } else {
-        fadeOutAndPause(el, 220);
-      }
-    }
-    activeAudioEl = null;
-  }
-
-  function fadeOutAndPause(el, durationMs) {
-    const startVol = el.volume;
-    const steps = 8;
-    const stepMs = Math.max(15, Math.round(durationMs / steps));
-    let tick = 0;
-    const t = setInterval(() => {
-      tick++;
-      el.volume = Math.max(0, startVol * (1 - tick / steps));
-      if (tick >= steps) {
-        clearInterval(t);
-        if (el !== activeAudioEl) {
-          el.pause();
-          el.volume = 0.42;
+  function stopAllHtmlAudio(immediate, exceptEl) {
+    const visited = new Set();
+    const candidates = [];
+    if (typeof document !== 'undefined') {
+      for (const id of Object.values(BGM_ELEMENT_IDS)) {
+        const el = document.getElementById(id);
+        if (el && !visited.has(el)) {
+          visited.add(el);
+          candidates.push(el);
         }
       }
-    }, stepMs);
+    }
+    for (const el of Object.values(dynamicAudioPool)) {
+      if (el && !visited.has(el)) {
+        visited.add(el);
+        candidates.push(el);
+      }
+    }
+    for (const el of candidates) {
+      if (el === exceptEl) continue;
+      if (el.paused) continue;
+      if (immediate) {
+        clearElementFade(el);
+        try {
+          el.pause();
+        } catch (_) {}
+      } else {
+        fadeOutAndPause(el, fadeDurationMs);
+      }
+    }
+    if (!exceptEl) activeAudioEl = null;
   }
 
   // ===== PROCEDURAL MODE SOUNDTRACKS (Auto-fallback when no custom file is dropped in assets/audio/) =====
@@ -203,19 +385,22 @@
     },
   };
 
-  function startSynthMusic(mode) {
+  function startSynthMusic(synthTrackId, sceneSnapshot) {
     stopSynthMusic();
-    if (!musicEnabled) return;
-    const track = SYNTH_TRACKS[mode];
+    if (!musicEnabled || musicVolume <= 0.001) return;
+    const track = SYNTH_TRACKS[synthTrackId];
     if (!track) return;
 
     synthStep = 0;
+    activePlaybackState = 'SYNTH';
 
     function playBeat() {
-      if (!musicEnabled || currentMusicMode !== mode) {
+      if (!musicEnabled || activeSceneId !== sceneSnapshot) {
         stopSynthMusic();
         return;
       }
+      if (musicVolume <= 0.001) return;
+      const musicScale = musicVolume / 0.45;
       withReadyMusicCtx((ctx) => {
         const len = track.bass.length;
         const i = synthStep % len;
@@ -227,16 +412,16 @@
         const dur = (track.stepMs / 1000) * 0.92;
 
         if (bFreq > 0) {
-          tone(ctx, bFreq, bFreq, dur * 1.35, track.bassType, track.bassVol, 0);
+          rawTone(ctx, bFreq, bFreq, dur * 1.35, track.bassType, track.bassVol * musicScale, 0);
         }
         if (aFreq > 0) {
-          tone(ctx, aFreq, aFreq, dur * 0.85, track.arpType, track.arpVol, 0.01);
+          rawTone(ctx, aFreq, aFreq, dur * 0.85, track.arpType, track.arpVol * musicScale, 0.01);
         }
         if (lFreq > 0) {
-          tone(ctx, lFreq, lFreq, dur * 1.45, track.leadType || 'sine', track.leadVol || 0.024, 0.015);
+          rawTone(ctx, lFreq, lFreq, dur * 1.45, track.leadType || 'sine', (track.leadVol || 0.024) * musicScale, 0.015);
         }
         if (track.pulseHat && i % 2 === 1) {
-          filteredNoise(ctx, 0.035, 'highpass', 5500, 7500, 1.5, 0.014, 0);
+          rawFilteredNoise(ctx, 0.035, 'highpass', 5500, 7500, 1.5, 0.014 * musicScale, 0);
         }
       });
     }
@@ -246,94 +431,154 @@
   }
 
   /**
-   * Play background music tailored to a game mode ('menu' | 'vs_ai' | 'pass_and_play' | 'tutorial').
-   * Automatically uses custom audio file in assets/audio/ if present, otherwise plays the mode's
-   * built-in procedural Web Audio soundtrack.
+   * Primary Stage 3C Scene-Based Music Router.
+   * Requests a logical audio scene (e.g. 'main_menu', 'classic_ai', 'frontier_settlement',
+   * 'frontier_expedition', 'scientist_lavoisier').
+   * - Preserves existing menu/battle/tutorial/scientist audio untouched.
+   * - Crossfades smoothly between scenes without clipping or overlapping tracks.
+   * - Handles UNASSIGNED_FALLBACK Frontier scenes cleanly (fades out previous track silently;
+   *   never throws errors or silently assigns unrelated existing tracks).
    */
-  function setMusicMode(mode) {
-    const prevMode = currentMusicMode;
-    currentMusicMode = mode || null;
+  function requestScene(sceneOrMode, options) {
+    const opts = options || {};
+    const prevScene = activeSceneId;
+    const nextCanonical = resolveSceneId(sceneOrMode);
 
-    if (!currentMusicMode) {
+    currentMusicMode = sceneOrMode || null;
+    activeSceneId = nextCanonical;
+
+    if (!nextCanonical) {
       stopSynthMusic();
-      stopAllHtmlAudio(false);
+      stopAllHtmlAudio(Boolean(opts.immediate));
       setAudioPromptVisible(false);
-      return;
+      activePlaybackState = 'IDLE';
+      return { sceneId: null, state: activePlaybackState };
     }
 
     if (!musicEnabled) {
       stopSynthMusic();
       stopAllHtmlAudio(true);
       setAudioPromptVisible(false);
-      return;
+      activePlaybackState = 'MUTED';
+      return { sceneId: nextCanonical, state: activePlaybackState };
     }
 
-    // If same mode is already playing cleanly, keep going seamlessly
-    if (prevMode === currentMusicMode && ((activeAudioEl && !activeAudioEl.paused) || synthMusicTimer)) {
-      return;
+    const cfg = getSceneConfig(nextCanonical);
+    const targetEl = getMusicEl(nextCanonical);
+
+    // Seamless continuation if the same scene (or shared preserved track element, e.g. main_menu <-> academy_menu) is already playing
+    if (
+      !opts.forceRestart &&
+      ((prevScene === nextCanonical && ((activeAudioEl && !activeAudioEl.paused) || synthMusicTimer || activePlaybackState === 'SILENT_UNASSIGNED')) ||
+        (targetEl && targetEl === activeAudioEl && !targetEl.paused))
+    ) {
+      if (targetEl && !targetEl.paused) {
+        targetEl.volume = computeTargetElVolume(cfg);
+      }
+      return { sceneId: nextCanonical, state: activePlaybackState, continued: true };
     }
 
     stopSynthMusic();
-    stopAllHtmlAudio(false);
 
-    const el = getMusicEl(currentMusicMode);
-    if (!el) {
-      startSynthMusic(currentMusicMode);
-      return;
+    // Unassigned Frontier scenes (no custom file/URL yet and silentIfMissing=true): fade out cleanly without unrelated reuse
+    if (cfg && cfg.silentIfMissing && !cfg.customUrl && !targetEl) {
+      stopAllHtmlAudio(Boolean(opts.immediate));
+      setAudioPromptVisible(false);
+      activePlaybackState = 'SILENT_UNASSIGNED';
+      return { sceneId: nextCanonical, state: activePlaybackState };
     }
 
-    const modeSnapshot = currentMusicMode;
-    el.volume = modeSnapshot === 'menu' ? 0.45 : 0.34;
-    activeAudioEl = el;
+    stopAllHtmlAudio(Boolean(opts.immediate), targetEl);
+
+    if (!targetEl) {
+      if (cfg && cfg.synthTrackId && SYNTH_TRACKS[cfg.synthTrackId]) {
+        startSynthMusic(cfg.synthTrackId, nextCanonical);
+        return { sceneId: nextCanonical, state: activePlaybackState };
+      }
+      activePlaybackState = 'SILENT_UNASSIGNED';
+      return { sceneId: nextCanonical, state: activePlaybackState };
+    }
+
+    const sceneSnapshot = nextCanonical;
+    const goalVol = computeTargetElVolume(cfg);
+    targetEl.loop = cfg ? cfg.loop !== false : true;
+    activeAudioEl = targetEl;
 
     try {
-      const p = el.play();
+      const p = targetEl.play();
       if (p && typeof p.then === 'function') {
         p.then(() => {
-          if (currentMusicMode === modeSnapshot && musicEnabled) {
+          if (activeSceneId === sceneSnapshot && musicEnabled) {
             setAudioPromptVisible(false);
+            activePlaybackState = 'HTML_AUDIO';
+            fadeInAudio(targetEl, goalVol, opts.immediate ? 0 : fadeDurationMs);
           } else {
-            el.pause();
+            try {
+              targetEl.pause();
+            } catch (_) {}
           }
         }).catch((err) => {
-          if (currentMusicMode !== modeSnapshot || !musicEnabled) return;
+          if (activeSceneId !== sceneSnapshot || !musicEnabled) return;
           activeAudioEl = null;
-          // Distinguish Autoplay block (NotAllowedError) vs missing custom file (NotSupportedError / network)
           if (err && err.name === 'NotAllowedError') {
-            if (modeSnapshot === 'menu') setAudioPromptVisible(true);
-          } else {
-            // No custom audio file dropped in for this mode yet -> play built-in procedural soundtrack!
+            activePlaybackState = 'AUTOPLAY_BLOCKED';
+            if (sceneSnapshot === 'main_menu' || sceneSnapshot === 'academy_menu') {
+              setAudioPromptVisible(true);
+            }
+          } else if (cfg && cfg.synthTrackId && SYNTH_TRACKS[cfg.synthTrackId]) {
+            // Missing custom drop-in file for a scene with a dedicated procedural synth soundtrack
             setAudioPromptVisible(false);
-            startSynthMusic(modeSnapshot);
+            startSynthMusic(cfg.synthTrackId, sceneSnapshot);
+          } else {
+            // Missing file on an unassigned/custom scene -> fail gracefully without error
+            setAudioPromptVisible(false);
+            activePlaybackState = 'SILENT_UNASSIGNED';
           }
         });
+      } else {
+        activePlaybackState = 'HTML_AUDIO';
+        fadeInAudio(targetEl, goalVol, opts.immediate ? 0 : fadeDurationMs);
       }
     } catch (_) {
       activeAudioEl = null;
-      startSynthMusic(modeSnapshot);
+      if (cfg && cfg.synthTrackId && SYNTH_TRACKS[cfg.synthTrackId]) {
+        startSynthMusic(cfg.synthTrackId, sceneSnapshot);
+      } else {
+        activePlaybackState = 'SILENT_UNASSIGNED';
+      }
     }
+
+    return { sceneId: nextCanonical, state: activePlaybackState };
+  }
+
+  /**
+   * Backwards-compatible wrapper for legacy callers ('menu' | 'vs_ai' | 'pass_and_play' | 'tutorial' | 'scientist_*').
+   */
+  function setMusicMode(mode) {
+    return requestScene(mode);
   }
 
   function startMenuMusic() {
-    setMusicMode('menu');
+    return requestScene('main_menu');
   }
 
   function stopMenuMusic() {
-    if (currentMusicMode === 'menu') {
-      setMusicMode(null);
+    if (activeSceneId === 'main_menu' || currentMusicMode === 'menu') {
+      requestScene(null);
     }
   }
 
   function setMusicEnabled(enabled) {
     musicEnabled = Boolean(enabled);
+    saveAudioSettings();
     if (!musicEnabled) {
       setAudioPromptVisible(false);
       stopSynthMusic();
       stopAllHtmlAudio(false);
-    } else if (currentMusicMode) {
-      const modeToResume = currentMusicMode;
-      currentMusicMode = null;
-      setMusicMode(modeToResume);
+      activePlaybackState = 'MUTED';
+    } else if (activeSceneId || currentMusicMode) {
+      const target = currentMusicMode || activeSceneId;
+      requestScene(target, { forceRestart: true });
     }
   }
 
@@ -345,33 +590,90 @@
     return currentMusicMode;
   }
 
+  function getActiveSceneId() {
+    return activeSceneId;
+  }
+
+  function getPlaybackState() {
+    return {
+      sceneId: activeSceneId,
+      mode: currentMusicMode,
+      state: activePlaybackState,
+      musicEnabled,
+      soundEnabled,
+      musicVolume,
+      sfxVolume,
+      fadeDurationMs,
+    };
+  }
+
+  function getMusicVolume() {
+    return musicVolume;
+  }
+
+  function setMusicVolume(vol) {
+    musicVolume = clamp(vol, 0, 1, DEFAULT_SETTINGS.musicVolume);
+    saveAudioSettings();
+    if (activeAudioEl && !activeAudioEl.paused && musicEnabled) {
+      clearElementFade(activeAudioEl);
+      activeAudioEl.volume = computeTargetElVolume(getSceneConfig(activeSceneId));
+    }
+    return musicVolume;
+  }
+
+  function getSfxVolume() {
+    return sfxVolume;
+  }
+
+  function setSfxVolume(vol) {
+    sfxVolume = clamp(vol, 0, 1, DEFAULT_SETTINGS.sfxVolume);
+    saveAudioSettings();
+    return sfxVolume;
+  }
+
+  function getFadeDuration() {
+    return fadeDurationMs;
+  }
+
+  function setFadeDuration(ms) {
+    fadeDurationMs = Math.round(clamp(ms, 0, 2000, DEFAULT_SETTINGS.fadeDurationMs));
+    saveAudioSettings();
+    return fadeDurationMs;
+  }
+
   /**
-   * Bind a user-selected local audio File directly to a mode or scientist <audio> element
-   * and immediately preview it.
+   * Bind a user-selected local audio File directly to a mode/scene and immediately preview it.
    */
   function loadCustomTrackForMode(mode, file) {
     if (!mode || !file || typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return false;
-    const el = getMusicEl(mode);
-    if (!el) return false;
     const objUrl = URL.createObjectURL(file);
-    el.src = objUrl;
-    el.load();
+    const el = getMusicEl(mode);
+    if (el) {
+      el.src = objUrl;
+      if (typeof el.load === 'function') el.load();
+    } else if (V.AudioConfig && typeof V.AudioConfig.registerSceneTrack === 'function') {
+      V.AudioConfig.registerSceneTrack(mode, { customUrl: objUrl, silentIfMissing: false });
+    } else {
+      return false;
+    }
     musicEnabled = true;
-    currentMusicMode = null; // Force clean restart on the newly loaded custom file
-    setMusicMode(mode);
+    saveAudioSettings();
+    requestScene(mode, { forceRestart: true });
     return true;
   }
 
+  // Load persisted audio preferences immediately on startup
+  loadAudioSettings();
+
   // Preload menu WAV immediately on script load so readyState is warm before first click
   if (typeof document !== 'undefined') {
-    const bgmInit = getMusicEl('menu');
+    const bgmInit = getMusicEl('main_menu');
     if (bgmInit && typeof bgmInit.load === 'function') {
       bgmInit.load();
     }
   }
 
   function warmUpAudio(ctx) {
-    // Prime Windows/browser audio pipeline with a 1-sample silent buffer + prebuilt noise buffer
     try {
       getNoiseBuffer(ctx);
       const silent = ctx.createBuffer(1, 1, ctx.sampleRate);
@@ -386,17 +688,14 @@
 
   function unlockAudio() {
     userGestureSeen = true;
-    if (currentMusicMode && musicEnabled) {
-      const el = getMusicEl(currentMusicMode);
+    if (activeSceneId && musicEnabled) {
+      const cfg = getSceneConfig(activeSceneId);
       const isPlayingHtml = activeAudioEl && !activeAudioEl.paused;
-      if (!isPlayingHtml && !synthMusicTimer) {
-        const m = currentMusicMode;
-        currentMusicMode = null;
-        setMusicMode(m);
-      } else if (el && el === activeAudioEl && el.paused) {
-        const m = currentMusicMode;
-        currentMusicMode = null;
-        setMusicMode(m);
+      const shouldRetry =
+        activePlaybackState === 'AUTOPLAY_BLOCKED' ||
+        (!isPlayingHtml && !synthMusicTimer && activePlaybackState !== 'SILENT_UNASSIGNED');
+      if (shouldRetry && !(cfg && cfg.silentIfMissing && !cfg.customUrl && !getMusicEl(activeSceneId))) {
+        requestScene(currentMusicMode || activeSceneId, { forceRestart: true });
       }
     }
     if (!soundEnabled && !musicEnabled) return;
@@ -411,7 +710,6 @@
     }
   }
 
-  // Capture-phase unlock on pointerdown/keydown so AudioContext is ALREADY warm before 'click' fires!
   if (typeof global.addEventListener === 'function') {
     const onGesture = () => {
       unlockAudio();
@@ -420,19 +718,12 @@
     global.addEventListener('keydown', onGesture, { capture: true, passive: true });
   }
 
-  /**
-   * Run `fn(ctx)` only when AudioContext is genuinely ready (never queue stale sounds
-   * into a frozen pre-gesture AudioContext that would burst late seconds afterward).
-   */
   function withReadyCtx(fn) {
-    if (!soundEnabled) return;
+    if (!soundEnabled || sfxVolume <= 0.001) return;
     const AudioCtor = global.AudioContext || global.webkitAudioContext;
     if (!AudioCtor) return;
 
-    // On initial page load before any user interaction, browsers suspend Web Audio;
-    // skip instead of queueing stale audio that would fire late on the first click.
     if (!userGestureSeen && (!audioCtx || audioCtx.state === 'suspended')) {
-      // Still allow headless/test environments where AudioContext starts immediately 'running'
       if (!audioCtx) {
         try {
           const probe = new AudioCtor();
@@ -456,22 +747,17 @@
       return;
     }
 
-    // If still resuming right after the very first gesture, play immediately once resumed
-    // (dropping if resume takes > 250ms so audio never arrives noticeably late).
     const requestedAt = Date.now();
     audioCtx.resume().then(() => {
-      if (soundEnabled && audioCtx.state === 'running' && Date.now() - requestedAt < 250) {
+      if (soundEnabled && sfxVolume > 0.001 && audioCtx.state === 'running' && Date.now() - requestedAt < 250) {
         warmUpAudio(audioCtx);
         fn(audioCtx);
       }
     }).catch(() => {});
   }
 
-  /**
-   * Like withReadyCtx, but gated by musicEnabled (so SFX mute never silences procedural music!).
-   */
   function withReadyMusicCtx(fn) {
-    if (!musicEnabled) return;
+    if (!musicEnabled || musicVolume <= 0.001) return;
     const AudioCtor = global.AudioContext || global.webkitAudioContext;
     if (!AudioCtor) return;
     if (!audioCtx) {
@@ -484,18 +770,12 @@
     }
     if (userGestureSeen) {
       audioCtx.resume().then(() => {
-        if (musicEnabled && audioCtx.state === 'running') {
+        if (musicEnabled && musicVolume > 0.001 && audioCtx.state === 'running') {
           warmUpAudio(audioCtx);
           fn(audioCtx);
         }
       }).catch(() => {});
     }
-  }
-
-  function getCtx() {
-    if (!soundEnabled) return null;
-    if (audioCtx && audioCtx.state === 'running') return audioCtx;
-    return null;
   }
 
   function getNoiseBuffer(ctx) {
@@ -512,7 +792,8 @@
     return buf;
   }
 
-  function tone(ctx, freqStart, freqEnd, duration, type, volume, delay) {
+  function rawTone(ctx, freqStart, freqEnd, duration, type, volume, delay) {
+    const vol = Math.max(0.0001, volume || 0.12);
     const start = ctx.currentTime + (delay || 0);
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -522,7 +803,7 @@
       osc.frequency.exponentialRampToValueAtTime(Math.max(20, freqEnd), start + duration);
     }
     gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.linearRampToValueAtTime(volume || 0.12, start + Math.min(0.015, duration * 0.2));
+    gain.gain.linearRampToValueAtTime(vol, start + Math.min(0.015, duration * 0.2));
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -530,7 +811,8 @@
     osc.stop(start + duration + 0.02);
   }
 
-  function filteredNoise(ctx, duration, filterType, freqStart, freqEnd, q, volume, delay) {
+  function rawFilteredNoise(ctx, duration, filterType, freqStart, freqEnd, q, volume, delay) {
+    const vol = Math.max(0.0001, volume || 0.1);
     const start = ctx.currentTime + (delay || 0);
     const src = ctx.createBufferSource();
     src.buffer = getNoiseBuffer(ctx);
@@ -544,7 +826,7 @@
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.linearRampToValueAtTime(volume || 0.1, start + Math.min(0.02, duration * 0.25));
+    gain.gain.linearRampToValueAtTime(vol, start + Math.min(0.02, duration * 0.25));
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
 
     src.connect(filter);
@@ -552,6 +834,15 @@
     gain.connect(ctx.destination);
     src.start(start);
     src.stop(start + duration + 0.02);
+  }
+
+  // SFX helpers apply independent sfxVolume scaling
+  function tone(ctx, freqStart, freqEnd, duration, type, volume, delay) {
+    rawTone(ctx, freqStart, freqEnd, duration, type, (volume || 0.12) * sfxVolume, delay);
+  }
+
+  function filteredNoise(ctx, duration, filterType, freqStart, freqEnd, q, volume, delay) {
+    rawFilteredNoise(ctx, duration, filterType, freqStart, freqEnd, q, (volume || 0.1) * sfxVolume, delay);
   }
 
   // ===== INDIVIDUAL SOUND EFFECTS =====
@@ -581,7 +872,6 @@
   function playCardDraw(delaySec) {
     withReadyCtx((ctx) => {
       const d = delaySec || 0;
-      // Crisp paper whoosh + soft flick
       filteredNoise(ctx, 0.1, 'bandpass', 1800, 3600, 1.8, 0.11, d);
       tone(ctx, 320, 560, 0.05, 'triangle', 0.045, d + 0.02);
     });
@@ -589,7 +879,6 @@
 
   function playIntroClash() {
     withReadyCtx((ctx) => {
-      // Immediate whoosh + resonant atomic VS chord (zero startup lag!)
       filteredNoise(ctx, 0.22, 'bandpass', 360, 2100, 1.4, 0.12, 0);
       tone(ctx, 130, 65, 0.36, 'triangle', 0.16, 0.02);
       tone(ctx, 392, 392, 0.38, 'sine', 0.09, 0.04);
@@ -699,7 +988,6 @@
 
   function playDefeat() {
     withReadyCtx((ctx) => {
-      // Dramatic descending minor lab-shutdown / meltdown cadence
       const notes = [392.0, 349.23, 311.13, 261.63];
       notes.forEach((f, idx) => {
         tone(ctx, f, f * 0.96, 0.44, 'sawtooth', 0.075, idx * 0.14);
@@ -709,11 +997,8 @@
     });
   }
 
-  /**
-   * Dispatch matching sound effects for a batch of engine events.
-   */
   function playSoundsForEvents(events) {
-    if (!soundEnabled || !events || events.length === 0) return;
+    if (!soundEnabled || sfxVolume <= 0.001 || !events || events.length === 0) return;
 
     let drawDelay = 0;
     for (const ev of events) {
@@ -782,6 +1067,8 @@
         case 'LIQUID_EMBRITTLEMENT':
         case 'ALPHA_POISON':
         case 'SPONTANEOUS_IGNITION':
+        case 'SCIENTIST_PASSIVE':
+        case 'SCIENTIST_ACTIVE':
           playAbility();
           break;
         default:
@@ -792,6 +1079,7 @@
 
   function setSoundEnabled(enabled) {
     soundEnabled = Boolean(enabled);
+    saveAudioSettings();
     if (soundEnabled) playButtonClick();
   }
 
@@ -800,11 +1088,24 @@
   }
 
   V.Sound = {
+    AUDIO_SETTINGS_KEY,
     unlockAudio,
     setSoundEnabled,
     isSoundEnabled,
+    requestScene,
     setMusicMode,
     getMusicMode,
+    getActiveSceneId,
+    getPlaybackState,
+    getMusicVolume,
+    setMusicVolume,
+    getSfxVolume,
+    setSfxVolume,
+    getFadeDuration,
+    setFadeDuration,
+    getAudioSettings,
+    loadAudioSettings,
+    saveAudioSettings,
     loadCustomTrackForMode,
     startMenuMusic,
     stopMenuMusic,

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="chemist-avatar-svg portrait-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <radialGradient id="avBgCur" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#064e3b"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="56" fill="url(#avBgCur)" stroke="#22c55e" stroke-width="3"/>
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#4ade80" stroke-width="1.4" stroke-dasharray="6 4" opacity="0.65"/>
+          <path d="M22 108 C24 84 40 78 60 78 C80 78 96 84 98 108 Z" fill="#1e293b" stroke="#22c55e" stroke-width="1.8"/>
+          <path d="M50 78 L60 92 L70 78 Z" fill="#d1fae5"/>
+          <!-- Classic upswept hair bun -->
+          <circle cx="60" cy="21" r="11" fill="#475569"/>
+          <path d="M35 56 C33 28 45 22 60 22 C75 22 87 28 85 56 C80 42 72 36 60 36 C48 36 40 42 35 56 Z" fill="#475569"/>
+          <ellipse cx="60" cy="54" rx="18" ry="20" fill="#fae0cc"/>
+          <circle cx="52" cy="51" r="2.2" fill="#0f172a"/>
+          <circle cx="68" cy="51" r="2.2" fill="#0f172a"/>
+          <path d="M53 64 Q60 68 67 64" fill="none" stroke="#7c2d12" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Glowing radium vial spark -->
+          <circle cx="94" cy="40" r="4.2" fill="#4ade80" stroke="#dcfce7" stroke-width="1.2"/>
+        </svg>

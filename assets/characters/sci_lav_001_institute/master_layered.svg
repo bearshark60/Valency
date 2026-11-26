@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 896 1200" width="896" height="1200" data-character-id="sci_lav_001_institute" data-ai-family="INSTITUTE" data-generation="INSTITUTE_HOLOGRAM" data-art-tier="PRODUCTION_PAINTERLY">
+  <title>SCI-LAV-001-INST — Institute AI Hologram: Antoine Lavoisier (Production Painterly 16-Layer Rig)</title>
+  <defs>
+    <pattern id="lavI_scanlines" width="8" height="8" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="8" y2="0" stroke="#e0f2fe" stroke-opacity="0.075" stroke-width="1" />
+    </pattern>
+
+    <!-- Exact Symmetrical Anatomical Eye Aperture Clips (Preserve Real Painted Upper Lash Line!) -->
+    <clipPath id="lavI_clipEyeLeft">
+      <path d="M338 396 C355 385, 391 385, 408 396 C391 405, 355 405, 338 396 Z" />
+    </clipPath>
+    <clipPath id="lavI_clipEyeRight">
+      <path d="M488 396 C505 385, 541 385, 558 396 C541 405, 505 405, 488 396 Z" />
+    </clipPath>
+    <linearGradient id="lavI_eyeTopShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#142b3d" stop-opacity="0.42" />
+      <stop offset="42%" stop-color="#1e3c52" stop-opacity="0.12" />
+      <stop offset="100%" stop-color="#1e3c52" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== LAYER 1: ARCHIVAL MUSEUM BACKGROUND & CALIBRATED RINGS ==================== -->
+  <g id="layer_bg" data-layer="layer_bg">
+    <image href="assets/characters/sci_lav_001_institute/layers/01_background.png" x="0" y="0" width="896" height="1200" preserveAspectRatio="none" />
+    <g stroke="#7dd3fc" fill="none" opacity="0.28">
+      <circle cx="448" cy="405" r="356" stroke-width="1.4" />
+      <circle cx="448" cy="405" r="316" stroke-width="1" stroke-dasharray="10 6" />
+      <circle cx="448" cy="405" r="268" stroke-width="0.9" opacity="0.6" />
+      <line x1="448" y1="42" x2="448" y2="82" stroke-width="1.4" />
+      <line x1="90" y1="405" x2="128" y2="405" stroke-width="1.2" />
+      <line x1="768" y1="405" x2="806" y2="405" stroke-width="1.2" />
+    </g>
+  </g>
+
+  <!-- ==================== RIG ROOT: TORSO / BREATHING GROUP ==================== -->
+  <g id="rig_torso_group" data-rig="torso">
+    <g id="layer_hair_rear" data-layer="layer_hair_rear">
+      <image href="assets/characters/sci_lav_001_institute/layers/03_hair_rear.png" x="0" y="0" width="896" height="1200" />
+    </g>
+    <g id="layer_clothing_rear" data-layer="layer_clothing_rear"></g>
+    <g id="layer_neck" data-layer="layer_neck"></g>
+    <g id="layer_clothing_front" data-layer="layer_clothing_front">
+      <image href="assets/characters/sci_lav_001_institute/layers/02_body_clothing.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== RIG HEAD GROUP (SERENE SYMMETRICAL MOTION) ==================== -->
+    <g id="rig_head_group" data-rig="head">
+      <g id="layer_head_base" data-layer="layer_head_base">
+        <image href="assets/characters/sci_lav_001_institute/layers/04_face_head.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_jaw_lower" data-layer="layer_jaw_lower">
+        <image href="assets/characters/sci_lav_001_institute/layers/12_jaw_lower.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- Left & Right Symmetrical Painted Eyes -->
+      <g id="layer_eye_left" data-layer="layer_eye_left">
+        <g clip-path="url(#lavI_clipEyeLeft)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_lav_001_institute/layers/05_eye_left_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="336" y="384" width="76" height="22" fill="url(#lavI_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_lav_001_institute/layers/07_lid_left_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="330" y="405" width="86" height="18" fill="#c7d5de" opacity="0.9" />
+          </g>
+        </g>
+      </g>
+
+      <g id="layer_eye_right" data-layer="layer_eye_right">
+        <g clip-path="url(#lavI_clipEyeRight)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_lav_001_institute/layers/06_eye_right_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="486" y="384" width="76" height="22" fill="url(#lavI_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_lav_001_institute/layers/08_lid_right_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="480" y="405" width="86" height="18" fill="#c7d5de" opacity="0.9" />
+          </g>
+        </g>
+      </g>
+
+      <g id="layer_brow_left" data-layer="layer_brow_left">
+        <image href="assets/characters/sci_lav_001_institute/layers/09_brow_left.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_brow_right" data-layer="layer_brow_right">
+        <image href="assets/characters/sci_lav_001_institute/layers/10_brow_right.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_nose_detail" data-layer="layer_nose_detail">
+        <ellipse cx="448" cy="436" rx="6" ry="34" fill="#f0f9ff" opacity="0.08" />
+      </g>
+      <g id="layer_mouth" data-layer="layer_mouth">
+        <ellipse data-part="mouth_cavity" cx="448" cy="550" rx="35" ry="5.5" fill="#18324a" opacity="0" />
+        <image href="assets/characters/sci_lav_001_institute/layers/11_mouth.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_hair_front" data-layer="layer_hair_front">
+        <image href="assets/characters/sci_lav_001_institute/layers/13_hair_front.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <!-- Zero Frontier Degradation / Mechanical Seams -->
+      <g id="layer_mech_crystal" data-layer="layer_mech_crystal" opacity="0"></g>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 16: CLEAN VOLUMETRIC MUSEUM HOLOGRAM SCANLINES ==================== -->
+  <g id="layer_fx_reconstruction" data-layer="layer_fx_reconstruction" opacity="0.45">
+    <rect x="0" y="0" width="896" height="1200" fill="url(#lavI_scanlines)" />
+  </g>
+</svg>

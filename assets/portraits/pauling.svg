@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="chemist-avatar-svg portrait-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <radialGradient id="avBgPau" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#451a03"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="56" fill="url(#avBgPau)" stroke="#f59e0b" stroke-width="3"/>
+          <polygon points="60,12 100,36 100,84 60,108 20,84 20,36" fill="none" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4 4" opacity="0.5"/>
+          <path d="M22 108 C24 84 40 78 60 78 C80 78 96 84 98 108 Z" fill="#1e293b" stroke="#f59e0b" stroke-width="1.8"/>
+          <polygon points="50,82 60,87 50,92" fill="#f59e0b"/>
+          <polygon points="70,82 60,87 70,92" fill="#f59e0b"/>
+          <path d="M35 48 C34 23 48 18 62 19 C78 20 86 28 85 48 C79 38 72 34 60 34 C48 34 41 38 35 48 Z" fill="#e2e8f0"/>
+          <ellipse cx="60" cy="54" rx="18" ry="20" fill="#f7d5ba"/>
+          <rect x="43" y="45" width="14" height="10" rx="3" fill="rgba(245,158,11,0.22)" stroke="#fde68a" stroke-width="2"/>
+          <rect x="63" y="45" width="14" height="10" rx="3" fill="rgba(245,158,11,0.22)" stroke="#fde68a" stroke-width="2"/>
+          <line x1="57" y1="50" x2="63" y2="50" stroke="#fde68a" stroke-width="1.8"/>
+          <path d="M52 65 Q60 70 68 65" fill="none" stroke="#7c2d12" stroke-width="2" stroke-linecap="round"/>
+        </svg>

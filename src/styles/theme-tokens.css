@@ -1,0 +1,190 @@
+/* VALENCY — Stage 3C Centralized Visual Design System Tokens
+ * Single source of truth for palette, typography, spacing, borders, panels, card frames, shadows,
+ * transitions, and data-attribute visual themes (`academy`, `frontier`, `laboratory`, `collective`).
+ * Loaded BEFORE main.css and mobile.css; visual changes here never alter gameplay logic.
+ */
+
+:root {
+  /* Core Palette Tokens */
+  --v-bg-base: #10151b;
+  --v-bg-surface: rgba(19, 27, 36, 0.94);
+  --v-bg-elevated: rgba(23, 31, 41, 0.96);
+  --v-text-primary: #f8fafc;
+  --v-text-secondary: #cbd5e1;
+  --v-text-muted: #94a3b8;
+
+  /* Brand & Accent Tokens */
+  --v-accent-primary: #38bdf8;
+  --v-accent-secondary: #2dd4bf;
+  --v-accent-tertiary: #a855f7;
+  --v-accent-warning: #f59e0b;
+  --v-accent-danger: #f87171;
+  --v-accent-success: #4ade80;
+
+  /* Typography */
+  --v-font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --v-font-mono: 'Cascadia Code', 'Consolas', ui-monospace, monospace;
+
+  /* Borders, Panel Treatments & Card Frames */
+  --v-border-subtle: rgba(148, 163, 184, 0.28);
+  --v-border-accent: rgba(56, 189, 248, 0.45);
+  --v-radius-panel: 16px;
+  --v-radius-card: 15px;
+  --v-radius-pill: 999px;
+  --v-panel-bg: linear-gradient(165deg, rgba(22, 30, 39, 0.94), rgba(12, 18, 26, 0.97));
+  --v-card-frame-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+
+  /* Spacing & Elevation */
+  --v-space-xs: 4px;
+  --v-space-sm: 8px;
+  --v-space-md: 14px;
+  --v-space-lg: 22px;
+  --v-shadow-panel: 0 16px 42px rgba(0, 0, 0, 0.55);
+  --v-shadow-glow: 0 0 34px rgba(45, 212, 191, 0.14);
+
+  /* Interface Transitions */
+  --v-transition-fast: 0.15s ease;
+  --v-transition-scene: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Scene Atmospheric Overlay (overrideable per visual theme) */
+  --v-scene-aura-1: rgba(56, 189, 248, 0.14);
+  --v-scene-aura-2: rgba(20, 184, 166, 0.10);
+  --v-scene-aura-3: rgba(245, 158, 11, 0.08);
+  --v-scene-grid-minor: rgba(148, 163, 184, 0.055);
+  --v-scene-grid-major: rgba(148, 163, 184, 0.09);
+}
+
+/* ===== THEME 1: ACADEMY (Order, institutional prestige, refined laboratories) ===== */
+body[data-visual-theme="academy"] {
+  --v-accent-primary: #38bdf8;
+  --v-accent-secondary: #5eead4;
+  --v-accent-tertiary: #fbbf24;
+  --v-border-accent: rgba(94, 234, 212, 0.46);
+  --v-scene-aura-1: rgba(56, 189, 248, 0.16);
+  --v-scene-aura-2: rgba(45, 212, 191, 0.11);
+  --v-scene-aura-3: rgba(251, 191, 36, 0.08);
+  --v-shadow-glow: 0 0 38px rgba(56, 189, 248, 0.18);
+}
+
+/* ===== THEME 2: FRONTIER (Crystalline science-fantasy exploration & molecular anomalies) ===== */
+body[data-visual-theme="frontier"] {
+  --v-accent-primary: #22d3ee;
+  --v-accent-secondary: #34d399;
+  --v-accent-tertiary: #f59e0b;
+  --v-border-accent: rgba(34, 211, 238, 0.52);
+  --v-scene-aura-1: rgba(14, 165, 233, 0.20);
+  --v-scene-aura-2: rgba(16, 185, 129, 0.14);
+  --v-scene-aura-3: rgba(245, 158, 11, 0.12);
+  --v-scene-grid-minor: rgba(34, 211, 238, 0.06);
+  --v-scene-grid-major: rgba(52, 211, 153, 0.11);
+  --v-shadow-glow: 0 0 42px rgba(34, 211, 238, 0.22);
+}
+
+/* ===== THEME 3: LABORATORY (Experimental instruments & controlled telemetry displays) ===== */
+body[data-visual-theme="laboratory"] {
+  --v-accent-primary: #2dd4bf;
+  --v-accent-secondary: #60a5fa;
+  --v-accent-tertiary: #94a3b8;
+  --v-border-accent: rgba(45, 212, 191, 0.5);
+  --v-scene-aura-1: rgba(20, 184, 166, 0.18);
+  --v-scene-aura-2: rgba(59, 130, 246, 0.12);
+  --v-scene-aura-3: rgba(148, 163, 184, 0.08);
+  --v-scene-grid-minor: rgba(45, 212, 191, 0.065);
+  --v-scene-grid-major: rgba(96, 165, 250, 0.11);
+}
+
+/* ===== THEME 4: THE COLLECTIVE (Geometric organization, repeating symmetry & calm control) ===== */
+body[data-visual-theme="collective"] {
+  --v-accent-primary: #a78bfa;
+  --v-accent-secondary: #818cf8;
+  --v-accent-tertiary: #38bdf8;
+  --v-border-accent: rgba(167, 139, 250, 0.58);
+  --v-scene-aura-1: rgba(139, 92, 246, 0.22);
+  --v-scene-aura-2: rgba(99, 102, 241, 0.16);
+  --v-scene-aura-3: rgba(56, 189, 248, 0.10);
+  --v-scene-grid-minor: rgba(167, 139, 250, 0.08);
+  --v-scene-grid-major: rgba(129, 140, 248, 0.15);
+  --v-shadow-glow: 0 0 46px rgba(139, 92, 246, 0.24);
+}
+
+/* Apply tokenized atmospheric backdrop seamlessly without disrupting existing layout */
+body[data-visual-theme] {
+  transition: background-color var(--v-transition-scene);
+  background-image:
+    radial-gradient(ellipse at 50% 18%, var(--v-scene-aura-1) 0%, rgba(16, 21, 27, 0) 58%),
+    radial-gradient(ellipse at 18% 85%, var(--v-scene-aura-2) 0%, rgba(16, 21, 27, 0) 48%),
+    radial-gradient(ellipse at 85% 82%, var(--v-scene-aura-3) 0%, rgba(16, 21, 27, 0) 46%),
+    linear-gradient(var(--v-scene-grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--v-scene-grid-minor) 1px, transparent 1px),
+    linear-gradient(var(--v-scene-grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--v-scene-grid-major) 1px, transparent 1px),
+    linear-gradient(180deg, #161d25 0%, #10151c 55%, #0c1117 100%);
+}
+
+/* Standardized Reusable Visual Components */
+.v-theme-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2.5px 9px;
+  border-radius: var(--v-radius-pill);
+  border: 1px solid var(--v-border-accent);
+  color: var(--v-accent-secondary);
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.v-resource-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--v-radius-pill);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--v-border-subtle);
+  color: var(--v-text-primary);
+}
+
+.v-audio-mixer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid var(--v-border-accent);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.v-audio-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.v-audio-row label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--v-text-primary);
+  min-width: 125px;
+}
+
+.v-audio-row input[type="range"] {
+  flex: 1;
+  min-width: 120px;
+  accent-color: var(--v-accent-secondary);
+}
+
+.v-audio-val {
+  font-family: var(--v-font-mono);
+  font-size: 12px;
+  color: var(--v-accent-secondary);
+  min-width: 40px;
+  text-align: right;
+}

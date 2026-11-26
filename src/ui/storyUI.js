@@ -59,6 +59,13 @@
    */
   function openStoryHub(initialTab) {
     if (initialTab) activeHubTab = initialTab;
+    let targetAudio = null;
+    if (V.Sound && V.Sound.requestScene) {
+      const curScene = V.Sound.getActiveSceneId ? V.Sound.getActiveSceneId() : null;
+      if (!curScene || !String(curScene).startsWith('scientist_')) {
+        targetAudio = 'academy_menu';
+      }
+    }
     const prog = V.Story.loadProgression();
     const chapter = V.Story.getChapter0();
     const scientists = V.Story.listScientistProfiles();
@@ -113,7 +120,10 @@
         <div class="frontier-teaser unlocked">
           <strong>🧭 ${esc(chapter.nextChapterPreview.title)} — UNLOCKED!</strong>
           <p>${esc(chapter.nextChapterPreview.teaser)}</p>
-          <span class="story-badge badge-stage2">Academy License: ${esc(prog.chapter0LicensureTier)} • Ready for Chapter 1 Expansion</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px;">
+            <span class="story-badge badge-stage2">Academy License: ${esc(prog.chapter0LicensureTier)}</span>
+            <button id="btn-enter-frontier-from-hub" class="btn-action btn-synth">Enter The Elemental Frontier →</button>
+          </div>
         </div>
       `
       : `
@@ -145,6 +155,16 @@
       }
 
       const bestRec = sProg.bestExaminationRecord;
+      const bestCompPills = bestRec && bestRec.competencies
+        ? `
+          <div class="archive-comp-row">
+            <span class="story-badge badge-open">Synthesis: ${bestRec.competencies.synthesis}%</span>
+            <span class="story-badge badge-open">Stability: ${bestRec.competencies.stability}%</span>
+            <span class="story-badge badge-open">Defensive: ${bestRec.competencies.defensive}%</span>
+            <span class="story-badge badge-open">Tactical: ${bestRec.competencies.tactical}%</span>
+          </div>
+        `
+        : '';
       const discoveries = sci.historicalDiscoveries.map((d) => `<li>${esc(d)}</li>`).join('');
       const stageTwoBlock = sProg.stageTwoUnlocked
         ? `
@@ -173,6 +193,7 @@
               </div>
             </div>
           </div>
+          ${bestCompPills}
           <p class="archive-bio">${esc(sci.biography)}</p>
           <div class="archive-discoveries">
             <strong>Historical Discoveries:</strong>
@@ -183,6 +204,27 @@
         </div>
       `;
     }).join('');
+
+    const cumSummary = V.Story.getChapter0CumulativeSummary ? V.Story.getChapter0CumulativeSummary(prog) : null;
+    const licenseArchiveBanner =
+      cumSummary && cumSummary.chapter0Completed
+        ? `
+          <div class="licensure-cert-card">
+            <div class="story-section-kicker">OFFICIAL VALENCY ACADEMY RECORD</div>
+            <div class="eval-top">
+              <strong>🎓 ${esc(cumSummary.finalLicensureTier)} Certified</strong>
+              <span class="eval-overall-pill">${cumSummary.cumulativeOverall}% Cumulative Avg</span>
+            </div>
+            <div class="archive-comp-row">
+              <span class="story-badge badge-tier">Synthesis: ${cumSummary.cumulativeCompetencies.synthesis}%</span>
+              <span class="story-badge badge-tier">Stability: ${cumSummary.cumulativeCompetencies.stability}%</span>
+              <span class="story-badge badge-tier">Defensive: ${cumSummary.cumulativeCompetencies.defensive}%</span>
+              <span class="story-badge badge-tier">Tactical: ${cumSummary.cumulativeCompetencies.tactical}%</span>
+            </div>
+            <div class="story-mission-sub">Exams Cleared: ${cumSummary.examsCleared}/${cumSummary.totalExams} • Archive: ${cumSummary.stageOneCount}/4 Stage 1, ${cumSummary.stageTwoCount}/4 Stage 2 • Chapter 1: The Frontier Clearance Active</div>
+          </div>
+        `
+        : '';
 
     const currentMode = V.Sound && V.Sound.getMusicMode ? V.Sound.getMusicMode() : null;
     const audioTracksHTML = SCIENTIST_AUDIO_TRACKS.map((t) => {
@@ -229,7 +271,7 @@
       </div>
 
       <div class="${activeHubTab === 'archive' ? '' : 'hidden'}">
-        <div class="archive-list">${archiveHTML}</div>
+        <div class="archive-list">${licenseArchiveBanner}${archiveHTML}</div>
       </div>
 
       <div class="${activeHubTab === 'audio' ? '' : 'hidden'}">
@@ -247,6 +289,12 @@
       root.querySelector('#btn-story-reset').addEventListener('click', () => {
         openResetConfirmModal();
       });
+      const enterFrontierBtn = root.querySelector('#btn-enter-frontier-from-hub');
+      if (enterFrontierBtn) {
+        enterFrontierBtn.addEventListener('click', () => {
+          if (V.FrontierUI) V.FrontierUI.openFrontierHub('world', '');
+        });
+      }
       root.querySelectorAll('[data-launch-mission]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const m = V.Story.getMissionById(btn.getAttribute('data-launch-mission'));
@@ -284,6 +332,9 @@
           openStoryHub('audio');
         });
       });
+    }, {
+      visualScene: 'academy_hub',
+      audioScene: targetAudio || undefined,
     });
   }
 
@@ -340,7 +391,7 @@
 
         <div class="story-char-grid">
           <div class="story-char-card">
-            <img src="assets/portraits/proctor.svg" alt="Academy Registrar" class="story-char-img" />
+            ${V.Visual && V.Visual.renderPortrait ? V.Visual.renderPortrait('proctor', 'story-char-img', 'Academy Registrar') : '<img src="assets/portraits/proctor.svg" alt="Academy Registrar" class="story-char-img" />'}
             <div>
               <div class="story-section-kicker">CHARACTER INTRODUCTION</div>
               <strong>Academy Registrar &amp; Licensure Proctor</strong>
@@ -349,7 +400,7 @@
           </div>
           ${lav ? `
             <div class="story-char-card">
-              <img src="${esc(lav.artworkRef)}" alt="${esc(lav.historicalName)}" class="story-char-img" />
+              ${V.Visual && V.Visual.renderPortrait ? V.Visual.renderPortrait(lav.portraitRef || 'lavoisier', 'story-char-img', lav.historicalName) : `<img src="${esc(lav.artworkRef)}" alt="${esc(lav.historicalName)}" class="story-char-img" />`}
               <div>
                 <div class="story-section-kicker">FIRST EXAMINER • CHAMBER 1</div>
                 <strong>${esc(lav.historicalName)} (${esc(lav.lifespan)})</strong>
@@ -438,11 +489,16 @@
       ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(56,189,248,0.22);color:#bae6fd;"><strong>${esc(sci.historicalName)}'s Examination Standard:</strong> <em>“${esc(sci.dialogue.briefing)}”</em></div>`
       : '';
 
+    const examFocusChips = ((mission.briefing && mission.briefing.licensureFocus) || [])
+      .map((f) => `<span class="story-badge badge-tier">${esc(f)}</span>`)
+      .join('');
+
     const rcHTML = rc
       ? `
         <div class="briefing-rc">
           <strong>🔬 Optional Stage Two Research Challenge — ${esc(rc.title)}</strong>
           <p>${esc(rc.description)}</p>
+          <div style="font-size:11px;color:#c4b5fd;margin-top:4px;">Evaluated automatically during this examination match—winning without it still unlocks Stage One Archive access.</div>
         </div>
       `
       : '';
@@ -463,6 +519,7 @@
         <div><strong>Opponent Strategy:</strong> ${esc(oppCfg.strategyProfile)} <span class="story-badge badge-diff">${esc(oppCfg.difficulty)}</span></div>
         <div style="margin-top:4px;"><strong>Examination Objective:</strong> ${esc(mission.briefing.objective)}</div>
         <div style="margin-top:4px;color:#94a3b8;"><strong>Lab Tip:</strong> ${esc(mission.briefing.tacticalTip)}</div>
+        ${examFocusChips ? `<div class="story-badges" style="margin-top:6px;">${examFocusChips}</div>` : ''}
         ${sciBriefingLine}
       </div>
       ${rcHTML}
@@ -501,7 +558,7 @@
     const sci = mission.scientistId ? V.Story.getScientistProfile(mission.scientistId) : null;
     const portraitKey = sci ? sci.portraitRef : (mission.opponentPortraitRef || 'proctor');
 
-    // Render full authored dialogue: scientist onVictory/onDefeat, OR Final Exam postVictoryDialogue array!
+    // Render full authored dialogue: scientist onVictory/onDefeat, OR Final Exam postVictoryDialogue/postDefeatDialogue!
     let reactionLines = [];
     if (sci) {
       reactionLines.push({
@@ -511,6 +568,8 @@
       });
     } else if (evalResult.won && Array.isArray(mission.postVictoryDialogue) && mission.postVictoryDialogue.length > 0) {
       reactionLines = mission.postVictoryDialogue;
+    } else if (!evalResult.won && Array.isArray(mission.postDefeatDialogue) && mission.postDefeatDialogue.length > 0) {
+      reactionLines = mission.postDefeatDialogue;
     } else {
       reactionLines.push({
         speaker: 'Academy Licensure Board',
@@ -583,11 +642,44 @@
     const nextMissionId = mission.nextMissionIds && mission.nextMissionIds[0];
     const nextMission = nextMissionId ? V.Story.getMissionById(nextMissionId) : null;
 
+    // Final Examination Graduation Certificate & Frontier Anomaly Dispatch
+    const cumSummary =
+      mission.unlocksChapter1 && evalResult.won && V.Story.getChapter0CumulativeSummary
+        ? V.Story.getChapter0CumulativeSummary(progression)
+        : null;
+    const finalCertificateHTML = cumSummary
+      ? `
+        <div class="licensure-cert-card">
+          <div class="story-section-kicker">OFFICIAL VALENCY ACADEMY LICENSURE CERTIFICATE</div>
+          <div class="eval-top">
+            <div>
+              <strong style="font-size:19px;color:#5eead4;">🎓 ${esc(cumSummary.finalLicensureTier)}</strong>
+              <div class="story-mission-sub">Cumulative Record Across ${cumSummary.examsCleared} / ${cumSummary.totalExams} Academy Examinations • Archive: ${cumSummary.stageOneCount}/4 Stage 1, ${cumSummary.stageTwoCount}/4 Stage 2</div>
+            </div>
+            <div class="eval-overall-pill">${cumSummary.cumulativeOverall}% Avg</div>
+          </div>
+          <div class="archive-comp-row">
+            <span class="story-badge badge-tier">Avg Synthesis: ${cumSummary.cumulativeCompetencies.synthesis}%</span>
+            <span class="story-badge badge-tier">Avg Stability: ${cumSummary.cumulativeCompetencies.stability}%</span>
+            <span class="story-badge badge-tier">Avg Defensive: ${cumSummary.cumulativeCompetencies.defensive}%</span>
+            <span class="story-badge badge-tier">Avg Tactical: ${cumSummary.cumulativeCompetencies.tactical}%</span>
+          </div>
+        </div>
+        ${mission.frontierAnomalyBriefing ? `
+          <div class="frontier-teaser unlocked" style="margin-top:0;">
+            <strong>🧭 ${esc(mission.frontierAnomalyBriefing.title)}</strong>
+            <p>${esc(mission.frontierAnomalyBriefing.summary)}</p>
+          </div>
+        ` : ''}
+      `
+      : '';
+
     const body = `
       <div class="dialogue-stack">${reactionHTML}</div>
 
       ${challengeQuoteHTML}
       ${unlocksHTML}
+      ${finalCertificateHTML}
 
       <div class="eval-card">
         <div class="eval-top">

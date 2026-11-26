@@ -1,0 +1,20 @@
+VALENCY — Background Music Drop-In Folder
+=========================================
+Each game mode AND each Historical Scientist in Story Mode supports its own custom background music file (.wav, .mp3, .ogg, or .m4a).
+If no custom file is present for a mode or scientist, VALENCY automatically plays a bespoke synthesized Web Audio theme!
+
+Classic & General Modes:
+  1. Main Menu:                   menu-theme.wav         (or .mp3 / .ogg / .m4a)
+  2. Classic vs. Mendeleev (AI):  ai-battle-theme.wav    (or .mp3 / .ogg / .m4a)
+  3. 2-Player Pass & Play:        pvp-theme.wav          (or .mp3 / .ogg / .m4a)
+  4. Interactive Tutorial:        tutorial-theme.wav     (or .mp3 / .ogg / .m4a)
+
+Story Mode — Historical Scientist Themes (Chapter 0: Academy Licensure):
+  5. Antoine Lavoisier:           lavoisier-theme.wav    (or .mp3 / .ogg / .m4a)
+  6. Dmitri Mendeleev:            mendeleev-theme.wav    (or .mp3 / .ogg / .m4a)
+  7. Linus Pauling:               pauling-theme.wav      (or .mp3 / .ogg / .m4a)
+  8. Marie Curie:                 curie-theme.wav        (or .mp3 / .ogg / .m4a)
+  9. Final Exam (Academy Proctor): final-exam-theme.wav  (or .mp3 / .ogg / .m4a)
+
+Just drop any audio track into this folder with the matching filename and refresh index.html!
+You can also click "🎵 Audio" inside Story Mode: Academy Licensure to preview any scientist's theme or test local audio files live.

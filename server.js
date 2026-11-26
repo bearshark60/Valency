@@ -73,7 +73,7 @@ const server = http.createServer((req, res) => {
       'Content-Length': total,
       'Accept-Ranges': 'bytes',
       'Content-Type': contentType,
-      'Cache-Control': ext === '.html' || ext === '.js' || ext === '.css' ? 'no-cache' : 'public, max-age=3600',
+      'Cache-Control': ['.html', '.js', '.css', '.svg', '.json'].includes(ext) ? 'no-store, no-cache, must-revalidate' : 'public, max-age=3600',
     });
     fs.createReadStream(filePath).pipe(res);
   });

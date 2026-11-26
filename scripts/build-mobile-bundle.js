@@ -16,6 +16,7 @@ function copyRecursive(src, dest) {
   if (stat.isDirectory()) {
     fs.mkdirSync(dest, { recursive: true });
     for (const entry of fs.readdirSync(src)) {
+      if (entry === 'concepts' || entry === 'production' || entry === 'qa') continue; // Exclude archival masters, concepts & QA sheets from lightweight mobile PWA runtime bundle
       copyRecursive(path.join(src, entry), path.join(dest, entry));
     }
   } else {
@@ -50,11 +51,14 @@ const dirsToCopy = [
   'src/data',
   'src/engine',
   'src/story',
+  'src/frontier',
+  'src/presentation',
   'src/styles',
   'src/ui',
   'assets/events',
   'assets/icons',
   'assets/portraits',
+  'assets/characters',
 ];
 for (const rel of dirsToCopy) {
   copyRecursive(path.join(ROOT, rel), path.join(OUT_DIR, rel));

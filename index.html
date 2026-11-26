@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VALENCY — Chemistry Card Game</title>
+  <link rel="stylesheet" href="src/styles/theme-tokens.css" />
   <link rel="stylesheet" href="src/styles/main.css" />
+  <link rel="stylesheet" href="src/styles/character-portrait.css" />
 </head>
 <body>
   <!-- ===== HOME MENU SCREEN ===== -->
@@ -23,6 +25,15 @@
           <span class="menu-cta-text">
             <strong>Story Mode: Academy Licensure</strong>
             <small>Chapter 0 • Historical Scientist Simulations &amp; Research Archive</small>
+          </span>
+          <span class="menu-cta-arrow">→</span>
+        </button>
+
+        <button id="menu-btn-frontier" class="menu-cta menu-cta-frontier">
+          <span class="menu-cta-icon">🧭</span>
+          <span class="menu-cta-text">
+            <strong>Chapter 1: The Elemental Frontier</strong>
+            <small>Sector 01 • Exploration, Expeditions, Deck &amp; Scientist Lab</small>
           </span>
           <span class="menu-cta-arrow">→</span>
         </button>
@@ -58,11 +69,13 @@
       <div class="menu-utility-row">
         <button id="menu-btn-periodic" class="ctrl-btn">Periodic Table</button>
         <button id="menu-btn-gallery" class="ctrl-btn">Event Art (18)</button>
+        <button id="menu-btn-char-studio" class="ctrl-btn" title="Open live 2D Animated Portrait Studio (Frontier vs. Institute)">🎭 Character Animation Studio</button>
         <button id="menu-btn-rules" class="ctrl-btn">Quick Rules</button>
         <button id="menu-btn-music" class="ctrl-btn">🎵 Music: On</button>
         <button id="menu-btn-pick-music" class="ctrl-btn" title="Test any local audio file immediately">📁 Pick Track</button>
         <input id="menu-music-file" type="file" accept="audio/*" class="hidden" />
         <button id="menu-btn-sfx" class="ctrl-btn">🔊 SFX: On</button>
+        <button id="menu-btn-audio-settings" class="ctrl-btn" title="Audio Mixer & Scene Volume Controls">🎛 Audio</button>
         <button id="menu-btn-fx" class="ctrl-btn">✨ FX: On</button>
       </div>
     </div>
@@ -143,6 +156,7 @@
         <button id="btn-rules" class="ctrl-btn" title="Open Quick Rules">Rules</button>
         <button id="btn-music-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Background Music">🎵</button>
         <button id="btn-sfx-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Sound Effects">🔊</button>
+        <button id="btn-audio-settings" class="ctrl-btn ctrl-icon-btn" title="Audio Mixer & Volume Settings">🎛</button>
         <button id="btn-fx-toggle" class="ctrl-btn ctrl-icon-btn" title="Toggle Visual Animations">✨</button>
         <button id="btn-sidebar-toggle" class="ctrl-btn" title="Toggle Hints & Log panel">Panel ▸</button>
         <button id="btn-concede" class="ctrl-btn ctrl-icon-btn" title="Concede / Abort Experiment (Fail State)">🏳</button>
@@ -217,12 +231,28 @@
   <script src="src/story/researchChallenges.js"></script>
   <script src="src/story/progression.js"></script>
   <script src="src/story/academyChapter.js"></script>
+  <!-- Stage 3B: The Elemental Frontier Foundation -->
+  <script src="src/frontier/playerProfile.js"></script>
+  <script src="src/frontier/collectionManager.js"></script>
+  <script src="src/frontier/scientistEquipment.js"></script>
+  <script src="src/frontier/worldManager.js"></script>
+  <script src="src/frontier/rewardProcessor.js"></script>
+  <script src="src/frontier/expeditionManager.js"></script>
+  <script src="src/frontier/investigationManager.js"></script>
+  <script src="src/frontier/encounterManager.js"></script>
+  <!-- Stage 3C / 3D.1: Modular Visual, Audio & Animated Character Presentation Architecture -->
+  <script src="src/presentation/visualTheme.js"></script>
+  <script src="src/presentation/audioConfig.js"></script>
+  <script src="src/presentation/characterSvgRegistry.js"></script>
+  <script src="src/presentation/characterRigEngine.js"></script>
+  <script src="src/presentation/characterRegistry.js"></script>
   <!-- Configurable AI & UI Controllers -->
   <script src="src/engine/ai.js"></script>
   <script src="src/ui/sound.js"></script>
   <script src="src/ui/animations.js"></script>
   <script src="src/ui/tutorial.js"></script>
   <script src="src/ui/storyUI.js"></script>
+  <script src="src/ui/frontierUI.js"></script>
   <script src="src/ui/app.js"></script>
 </body>
 </html>

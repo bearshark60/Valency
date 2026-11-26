@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 896 1200" width="896" height="1200" data-character-id="sci_men_002_frontier" data-ai-family="FRONTIER" data-generation="GEN_2_DRIFTING" data-art-tier="PRODUCTION_PAINTERLY">
+  <title>SCI-MEN-002 — Frontier Construct: Dmitri Mendeleev (Production Painterly 16-Layer Rig)</title>
+  <defs>
+    <linearGradient id="menF_scanSweep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0" />
+      <stop offset="46%" stop-color="#a78bfa" stop-opacity="0.46" />
+      <stop offset="52%" stop-color="#7dd3fc" stop-opacity="0.72" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Exact Anatomical Eye Aperture Clips (Preserve Real Painted Hooded Upper Lash Line!) -->
+    <clipPath id="menF_clipEyeLeft">
+      <path d="M409 384 C422 374, 461 374, 475 384 C461 393, 422 393, 409 384 Z" />
+    </clipPath>
+    <clipPath id="menF_clipEyeRight">
+      <path d="M537 387 C549 377, 583 377, 595 387 C583 396, 549 396, 537 387 Z" />
+    </clipPath>
+    <linearGradient id="menF_eyeTopShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#191210" stop-opacity="0.48" />
+      <stop offset="44%" stop-color="#2a1d17" stop-opacity="0.16" />
+      <stop offset="100%" stop-color="#2a1d17" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="menF_veinGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2fe" />
+      <stop offset="45%" stop-color="#a78bfa" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== LAYER 1: SUBORDINATE PERIODIC GRID BACKGROUND ==================== -->
+  <g id="layer_bg" data-layer="layer_bg">
+    <image href="assets/characters/sci_men_002_frontier/layers/01_background.png" x="0" y="0" width="896" height="1200" preserveAspectRatio="none" />
+    <g opacity="0.14" stroke="#94a3b8" fill="none">
+      <!-- Subtle drafted 19th-century periodic columns and empty eka-element brackets -->
+      <line x1="92" y1="220" x2="92" y2="690" stroke-width="1" />
+      <line x1="158" y1="220" x2="158" y2="690" stroke-width="1" />
+      <line x1="738" y1="220" x2="738" y2="690" stroke-width="1" />
+      <line x1="804" y1="220" x2="804" y2="690" stroke-width="1" />
+      <line x1="68" y1="352" x2="828" y2="352" stroke-width="1" />
+      <line x1="68" y1="432" x2="828" y2="432" stroke-width="1" />
+      <line x1="68" y1="512" x2="828" y2="512" stroke-width="1" />
+      <line x1="68" y1="592" x2="828" y2="592" stroke-width="1" />
+      <!-- Left & right bracketed eka-element gap motifs -->
+      <path d="M138 378 L122 378 L122 496 L138 496" stroke="#a78bfa" stroke-width="1.6" opacity="0.8" />
+      <path d="M758 378 L774 378 L774 496 L758 496" stroke="#38bdf8" stroke-width="1.6" opacity="0.8" />
+    </g>
+  </g>
+
+  <!-- ==================== RIG ROOT: TORSO / BREATHING GROUP ==================== -->
+  <g id="rig_torso_group" data-rig="torso">
+
+    <!-- ==================== LAYER 2: REAR HAIR (SHOULDER-LENGTH IRON-GREY LOCKS) ==================== -->
+    <g id="layer_hair_rear" data-layer="layer_hair_rear">
+      <image href="assets/characters/sci_men_002_frontier/layers/03_hair_rear.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== LAYER 3: REAR CLOTHING ==================== -->
+    <g id="layer_clothing_rear" data-layer="layer_clothing_rear"></g>
+
+    <!-- ==================== LAYER 4: NECK (OVERLAPPING CONTINUOUS COLLAR UNDER-PAINT) ==================== -->
+    <g id="layer_neck" data-layer="layer_neck"></g>
+
+    <!-- ==================== LAYER 5: FRONT CLOTHING, WAISTCOAT & POCKET-WATCH CHAIN ==================== -->
+    <g id="layer_clothing_front" data-layer="layer_clothing_front">
+      <image href="assets/characters/sci_men_002_frontier/layers/02_body_clothing.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== RIG HEAD GROUP (WEIGHTED AXIAL POSTURE) ==================== -->
+    <g id="rig_head_group" data-rig="head">
+
+      <!-- ==================== LAYER 6: PAINTERLY HEAD, UPPER BEARD & MUSTACHE BASE ==================== -->
+      <g id="layer_head_base" data-layer="layer_head_base">
+        <image href="assets/characters/sci_men_002_frontier/layers/04_face_head.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 7: LOWER JAW & CASCADING CENTRAL BEARD ==================== -->
+      <g id="layer_jaw_lower" data-layer="layer_jaw_lower">
+        <image href="assets/characters/sci_men_002_frontier/layers/12_jaw_lower.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 8: LEFT EYE & PAINTED EYELID ==================== -->
+      <g id="layer_eye_left" data-layer="layer_eye_left">
+        <g clip-path="url(#menF_clipEyeLeft)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_men_002_frontier/layers/05_eye_left_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="407" y="372" width="70" height="21" fill="url(#menF_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_men_002_frontier/layers/07_lid_left_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="404" y="393" width="76" height="17" fill="#c79e86" opacity="0.92" />
+          </g>
+        </g>
+      </g>
+
+      <!-- ==================== LAYER 9: RIGHT EYE & PAINTED EYELID ==================== -->
+      <g id="layer_eye_right" data-layer="layer_eye_right">
+        <g clip-path="url(#menF_clipEyeRight)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_men_002_frontier/layers/06_eye_right_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="535" y="375" width="62" height="21" fill="url(#menF_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_men_002_frontier/layers/08_lid_right_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="532" y="396" width="68" height="17" fill="#c0967f" opacity="0.92" />
+          </g>
+        </g>
+      </g>
+
+      <!-- ==================== LAYER 10: LEFT SCULPTURAL EYEBROW ==================== -->
+      <g id="layer_brow_left" data-layer="layer_brow_left">
+        <image href="assets/characters/sci_men_002_frontier/layers/09_brow_left.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 11: RIGHT SCULPTURAL EYEBROW ==================== -->
+      <g id="layer_brow_right" data-layer="layer_brow_right">
+        <image href="assets/characters/sci_men_002_frontier/layers/10_brow_right.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 12: NOSE & FACIAL SHADING ==================== -->
+      <g id="layer_nose_detail" data-layer="layer_nose_detail">
+        <ellipse cx="520" cy="434" rx="6" ry="30" fill="#fff6eb" opacity="0.05" />
+      </g>
+
+      <!-- ==================== LAYER 13: MUSTACHE-SAFE PAINTERLY MOUTH ==================== -->
+      <g id="layer_mouth" data-layer="layer_mouth">
+        <ellipse data-part="mouth_cavity" cx="516" cy="536" rx="28" ry="5.5" fill="#2c1614" opacity="0" />
+        <image href="assets/characters/sci_men_002_frontier/layers/11_mouth.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 14: FRONT SWEPT IRON-GREY HAIR CROWN ==================== -->
+      <g id="layer_hair_front" data-layer="layer_hair_front">
+        <image href="assets/characters/sci_men_002_frontier/layers/13_hair_front.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 15: GEN-2 VIOLET/CYAN CRYSTALLINE VEIN OVERLAY ==================== -->
+      <g id="layer_mech_crystal" data-layer="layer_mech_crystal" opacity="0.14">
+        <!-- Traces Frontier Mendeleev's exact painted left-temple crystalline veins -->
+        <path d="M366 282 L356 310 L374 336 L376 356" fill="none" stroke="url(#menF_veinGlow)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M384 318 L374 336" fill="none" stroke="#e0f2fe" stroke-width="1.1" stroke-linecap="round" opacity="0.88" />
+        <path d="M352 378 L360 422 L370 452" fill="none" stroke="#a78bfa" stroke-width="1.3" stroke-linecap="round" opacity="0.72" />
+        <!-- Traces exact painted neck & collar crystalline veins -->
+        <path d="M332 530 L348 566 L342 596" fill="none" stroke="url(#menF_veinGlow)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M358 556 L348 566 L366 600" fill="none" stroke="#c4b5fd" stroke-width="1.3" stroke-linecap="round" opacity="0.85" />
+        <path d="M338 616 L360 642 L382 666" fill="none" stroke="#7dd3fc" stroke-width="1.5" stroke-linecap="round" opacity="0.78" />
+        <!-- Subtle faceted crystal cleavage micro-nodes -->
+        <polygon points="356,304 363,310 356,316 349,310" fill="none" stroke="#e0f2fe" stroke-width="1.0" opacity="0.7" />
+        <polygon points="348,559 356,566 348,573 340,566" fill="none" stroke="#a78bfa" stroke-width="1.1" opacity="0.76" />
+        <circle cx="374" cy="336" r="2.2" fill="#e0f2fe" />
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 16: GEN-2 ENCOUNTER SCAN & PERIODIC LATTICE FX ==================== -->
+  <g id="layer_fx_reconstruction" data-layer="layer_fx_reconstruction" opacity="0">
+    <rect data-part="fx_scanbar" x="0" y="200" width="896" height="52" fill="url(#menF_scanSweep)" />
+    <g data-part="fx_lattice" stroke="#a78bfa" fill="none" stroke-width="1.3" opacity="0.78">
+      <!-- Periodic 3-cell eka-gap telemetry overlay (distinct from Lavoisier's hex reticle) -->
+      <rect x="612" y="318" width="166" height="92" stroke="#38bdf8" stroke-dasharray="4 3" opacity="0.72" />
+      <line x1="667" y1="318" x2="667" y2="410" stroke-width="1" />
+      <line x1="722" y1="318" x2="722" y2="410" stroke-width="1" />
+      <line x1="612" y1="364" x2="778" y2="364" stroke-width="1" />
+      <rect x="669" y="366" width="51" height="42" stroke="#e0f2fe" stroke-width="1.5" />
+      <text x="684" y="393" fill="#e0f2fe" font-family="Consolas, monospace" font-size="16" stroke="none">[?]</text>
+      <text x="614" y="308" fill="#c4b5fd" font-family="Consolas, monospace" font-size="12" stroke="none">EKA-SYNC // GRP.IV</text>
+      <text x="614" y="428" fill="#7dd3fc" font-family="Consolas, monospace" font-size="11" stroke="none">GEN_2 // LATTICE DRIFT</text>
+    </g>
+  </g>
+</svg>

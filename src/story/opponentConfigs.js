@@ -44,17 +44,17 @@
         recycleInactiveWithEquilibrium: true,
       },
       eventCardPreferences: {
-        redOrder: ['PRECIPITATION', 'ACID_RAIN', 'BOND_CLEAVAGE', 'HALF_LIFE_DECAY', 'ELECTROLYSIS'],
+        redOrder: ['PRECIPITATION', 'HALF_LIFE_DECAY'], // Foundational conservationist avoids wanton destruction
         yellowOrder: ['BUFFER_SOLUTION', 'EQUILIBRIUM_SHIFT', 'DISTILLATION', 'RESONANCE_STABILIZER', 'THERMAL_ACTIVATION', 'SYNTHESIS_ACCELERATOR'],
-        useOxidationMinOppElements: 4,
-        useReactionDelayMinOppSP: 14,
+        useOxidationMinOppElements: 5,
+        useReactionDelayMinOppSP: 18,
         useDiffusionIfHandSmaller: false,
       },
       enDisplacementEvaluation: {
         enabled: true,
         evaluateBeforeDefense: false,
-        minNetSwing: 12, // Only executes highly efficient, conservative displacements
-        pierceShieldBonus: 3,
+        minNetSwing: 18, // Foundational calibration: only takes major conservation swings
+        pierceShieldBonus: 2,
       },
       legalMoveValidation: true,
       decisionLogging: true,

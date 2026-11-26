@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 896 1200" width="896" height="1200" data-character-id="sci_lav_001_frontier" data-ai-family="FRONTIER" data-generation="GEN_1_INTACT" data-art-tier="PRODUCTION_PAINTERLY">
+  <title>SCI-LAV-001 — Frontier Construct: Antoine Lavoisier (Production Painterly 16-Layer Rig)</title>
+  <defs>
+    <linearGradient id="lavF_scanSweep" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0" />
+      <stop offset="48%" stop-color="#7dd3fc" stop-opacity="0.48" />
+      <stop offset="52%" stop-color="#e0f2fe" stop-opacity="0.72" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Exact Anatomical Eye Aperture Clips (Preserve Real Painted Upper Lash Line!) -->
+    <clipPath id="lavF_clipEyeLeft">
+      <path d="M293 396 C305 386, 336 386, 349 396 C337 404, 305 404, 293 396 Z" />
+    </clipPath>
+    <clipPath id="lavF_clipEyeRight">
+      <path d="M425 394 C441 384, 477 384, 493 394 C477 403, 441 403, 425 394 Z" />
+    </clipPath>
+    <linearGradient id="lavF_eyeTopShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1b120e" stop-opacity="0.46" />
+      <stop offset="42%" stop-color="#2b1c15" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#2b1c15" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== LAYER 1: CONTINUOUS SCIENTIFIC BACKGROUND ==================== -->
+  <g id="layer_bg" data-layer="layer_bg">
+    <image href="assets/characters/sci_lav_001_frontier/layers/01_background.png" x="0" y="0" width="896" height="1200" preserveAspectRatio="none" />
+    <g opacity="0.16" stroke="#7dd3fc" fill="none">
+      <line x1="88" y1="458" x2="310" y2="458" stroke-width="1.2" />
+      <polygon points="122,458 76,650 168,650" stroke-width="1" />
+      <circle cx="748" cy="240" r="24" stroke-width="1" />
+      <line x1="726" y1="252" x2="686" y2="274" stroke-width="1" />
+      <circle cx="670" cy="284" r="16" stroke-width="1" />
+      <circle cx="774" cy="596" r="20" stroke-width="1" />
+      <line x1="756" y1="586" x2="718" y2="564" stroke-width="1" />
+    </g>
+  </g>
+
+  <!-- ==================== RIG ROOT: TORSO / BREATHING GROUP ==================== -->
+  <g id="rig_torso_group" data-rig="torso">
+
+    <!-- ==================== LAYER 2: REAR HAIR (VELVET QUEUE & NAPE) ==================== -->
+    <g id="layer_hair_rear" data-layer="layer_hair_rear">
+      <image href="assets/characters/sci_lav_001_frontier/layers/03_hair_rear.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== LAYER 3: REAR CLOTHING ==================== -->
+    <g id="layer_clothing_rear" data-layer="layer_clothing_rear"></g>
+
+    <!-- ==================== LAYER 4: NECK (OVERLAPPING CONTINUOUS UNDER-PAINT) ==================== -->
+    <g id="layer_neck" data-layer="layer_neck"></g>
+
+    <!-- ==================== LAYER 5: FRONT CLOTHING & SHOULDERS ==================== -->
+    <g id="layer_clothing_front" data-layer="layer_clothing_front">
+      <image href="assets/characters/sci_lav_001_frontier/layers/02_body_clothing.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== RIG HEAD GROUP (SWAY / TILT / MICRO-NOD) ==================== -->
+    <g id="rig_head_group" data-rig="head">
+
+      <!-- ==================== LAYER 6: PAINTERLY HEAD BASE (CONTINUOUS UNDER-PAINT) ==================== -->
+      <g id="layer_head_base" data-layer="layer_head_base">
+        <image href="assets/characters/sci_lav_001_frontier/layers/04_face_head.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 7: LOWER JAW & CHIN ==================== -->
+      <g id="layer_jaw_lower" data-layer="layer_jaw_lower">
+        <image href="assets/characters/sci_lav_001_frontier/layers/12_jaw_lower.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 8: LEFT EYE & PAINTED EYELID ==================== -->
+      <g id="layer_eye_left" data-layer="layer_eye_left">
+        <g clip-path="url(#lavF_clipEyeLeft)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_lav_001_frontier/layers/05_eye_left_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="290" y="384" width="64" height="22" fill="url(#lavF_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_lav_001_frontier/layers/07_lid_left_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="284" y="405" width="76" height="18" fill="#c9a48c" opacity="0.92" />
+          </g>
+        </g>
+      </g>
+
+      <!-- ==================== LAYER 9: RIGHT EYE & PAINTED EYELID (SUBTLE ASYMMETRY) ==================== -->
+      <g id="layer_eye_right" data-layer="layer_eye_right">
+        <g clip-path="url(#lavF_clipEyeRight)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_lav_001_frontier/layers/06_eye_right_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="422" y="382" width="76" height="22" fill="url(#lavF_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_lav_001_frontier/layers/08_lid_right_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="416" y="404" width="86" height="18" fill="#cfa990" opacity="0.92" />
+          </g>
+        </g>
+      </g>
+
+      <!-- ==================== LAYER 10: LEFT EYEBROW ==================== -->
+      <g id="layer_brow_left" data-layer="layer_brow_left">
+        <image href="assets/characters/sci_lav_001_frontier/layers/09_brow_left.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 11: RIGHT EYEBROW ==================== -->
+      <g id="layer_brow_right" data-layer="layer_brow_right">
+        <image href="assets/characters/sci_lav_001_frontier/layers/10_brow_right.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 12: NOSE & FACIAL SHADING ==================== -->
+      <g id="layer_nose_detail" data-layer="layer_nose_detail">
+        <ellipse cx="378" cy="436" rx="6" ry="34" fill="#fff6eb" opacity="0.06" />
+      </g>
+
+      <!-- ==================== LAYER 13: PAINTERLY MOUTH ==================== -->
+      <g id="layer_mouth" data-layer="layer_mouth">
+        <ellipse data-part="mouth_cavity" cx="382" cy="548" rx="34" ry="5.5" fill="#3a1c19" opacity="0" />
+        <image href="assets/characters/sci_lav_001_frontier/layers/11_mouth.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 14: FRONT POWDERED HAIR & CURLS ==================== -->
+      <g id="layer_hair_front" data-layer="layer_hair_front">
+        <image href="assets/characters/sci_lav_001_frontier/layers/13_hair_front.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- ==================== LAYER 15: SUBTLE TEMPLE/JAW CRYSTALLINE RECONSTRUCTION SEAM ==================== -->
+      <g id="layer_mech_crystal" data-layer="layer_mech_crystal" opacity="0.08">
+        <!-- Traces Lavoisier's exact painted hairline cheek/temple seam -->
+        <path d="M562 444 L526 484 L518 558 L496 608" fill="none" stroke="#38bdf8" stroke-width="2.1" stroke-linecap="round" />
+        <path d="M562 444 L526 484 L518 558" fill="none" stroke="#e0f2fe" stroke-width="0.9" opacity="0.85" />
+        <polygon points="546,456 560,464 560,480 546,488 532,480 532,464" fill="none" stroke="#7dd3fc" stroke-width="1.2" opacity="0.72" />
+        <polygon points="532,480 546,488 546,504 532,512 518,504 518,488" fill="none" stroke="#38bdf8" stroke-width="1.1" opacity="0.6" />
+        <circle cx="562" cy="444" r="2.6" fill="#bae6fd" />
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 16: ENCOUNTER SCAN & RECONSTRUCTION FX ==================== -->
+  <g id="layer_fx_reconstruction" data-layer="layer_fx_reconstruction" opacity="0">
+    <rect data-part="fx_scanbar" x="0" y="200" width="896" height="52" fill="url(#lavF_scanSweep)" />
+    <g data-part="fx_lattice" stroke="#38bdf8" fill="none" stroke-width="1.3" opacity="0.75">
+      <line x1="422" y1="362" x2="564" y2="362" stroke-dasharray="4 4" />
+      <line x1="422" y1="426" x2="564" y2="426" stroke-dasharray="4 4" />
+      <polygon points="462,374 484,386 484,410 462,422 440,410 440,386" />
+      <text x="572" y="370" fill="#7dd3fc" font-family="Consolas, monospace" font-size="13" stroke="none">RECON.SYNC 99.4%</text>
+      <text x="572" y="388" fill="#38bdf8" font-family="Consolas, monospace" font-size="11" stroke="none">CYCLE_1000 // DRIFT</text>
+    </g>
+  </g>
+</svg>

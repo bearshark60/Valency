@@ -1,0 +1,32 @@
+# VALENCY — Git Ignore Rules
+# Preserves zero-build vanilla JS repo cleanliness while keeping local backups/audio intact on disk.
+
+# Legacy manual snapshot archives (replaced by Git history; kept locally on disk)
+.checkpoints/
+
+# Generated mobile PWA distribution artifacts (rebuilt via: node scripts/build-mobile-bundle.js)
+dist/
+
+# Large uncompressed WAV audio files (~60+ MB total; keep locally on disk, use compressed .m4a/.mp3/.ogg in Git)
+assets/audio/*.wav
+
+# Optional Capacitor native mobile wrapper dependencies & generated native projects
+node_modules/
+mobile-native/node_modules/
+mobile-native/ios/
+mobile-native/android/
+
+# Local AI review packet exports (ephemeral)
+.ai-packets/
+
+# Secrets & environment files
+.env
+.env.local
+.env.*.local
+
+# OS & editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+npm-debug.log*

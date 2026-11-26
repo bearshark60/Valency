@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VALENCY — Core Rules Engine Test Suite</title>
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b1220; color: #f1f5f9; padding: 24px; max-width: 860px; margin: 0 auto; }
+    h1 { margin-bottom: 6px; }
+    .summary { font-size: 16px; font-weight: 800; padding: 12px 16px; border-radius: 10px; margin: 14px 0 18px; }
+    .pass-bg { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #86efac; }
+    .fail-bg { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+    .row { padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; background: #131d31; border-left: 4px solid #22c55e; font-size: 13px; }
+    .row.fail { border-left-color: #ef4444; color: #fecaca; }
+    a { color: #38bdf8; }
+  </style>
+</head>
+<body>
+  <h1>⚛ VALENCY — Automated Rules Verification</h1>
+  <p><a href="index.html">← Back to Playable Game</a></p>
+  <div id="summary" class="summary">Running tests...</div>
+  <div id="results"></div>
+
+  <script src="src/data/cards.js"></script>
+  <script src="src/data/compounds.js"></script>
+  <script src="src/engine/gameEngine.js"></script>
+  <script src="src/engine/ai.js"></script>
+  <script>
+    (function () {
+      const V = window.Valency;
+      const results = [];
+
+      function assert(cond, msg) {
+        if (!cond) throw new Error(msg || 'Assertion failed');
+      }
+
+      function test(name, fn) {
+        try {
+          fn();
+          results.push({ name, ok: true });
+        } catch (err) {
+          results.push({ name, ok: false, err: err.message });
+        }
+      }
+
+      function makeCardBySymbol(sym, suffix) {
+        const spec = V.ELEMENT_BY_SYMBOL[sym];
+        return { id: `test_${sym}_${suffix || Math.random()}`, ...spec };
+      }
+
+      function makeEffectCard(effectId, suffix) {
+        const spec = [...V.INSTANCE_SPECS, ...V.EVENT_SPECS].find((s) => s.effectId === effectId);
+        return { id: `test_${effectId}_${suffix || Math.random()}`, ...spec };
+      }
+
+      // 1. Deck size & composition
+      test('Deck has exactly 120 cards (70 elements [64 bonding + 6 Noble Gases], 28 Yellow Instances, 22 Red Events = 42% Events)', () => {
+        const deck = V.buildFullDeck();
+        assert(deck.length === 120, `Expected 120, got ${deck.length}`);
+        const bonding = deck.filter((c) => c.kind === 'element').length;
+        const noble = deck.filter((c) => c.kind === 'noble_gas').length;
+        const inst = deck.filter((c) => c.kind === 'instance').length;
+        const ev = deck.filter((c) => c.kind === 'event').length;
+        assert(bonding === 64, `Expected 64 bonding elements, got ${bonding}`);
+        assert(noble === 6, `Expected 6 noble gases, got ${noble}`);
+        assert(inst === 28, `Expected 28 yellow instances, got ${inst}`);
+        assert(ev === 22, `Expected 22 red events, got ${ev}`);
+      });
+
+      // 2. Unit 1 Sample Scoring Table + Diatomics
+      test('Real compound validation & Unit 1 sample scoring (H2O=8, NaCl=8, CH4=8, CO2=16, O2=12)', () => {
+        const h2o = V.validateSynthesis([makeCardBySymbol('H', 1), makeCardBySymbol('H', 2), makeCardBySymbol('O', 1)], false);
+        assert(h2o.valid && h2o.compound.formula === 'H₂O' && h2o.baseSP === 8, 'H2O failed');
+
+        const nacl = V.validateSynthesis([makeCardBySymbol('Na', 1), makeCardBySymbol('Cl', 1)], false);
+        assert(nacl.valid && nacl.compound.formula === 'NaCl' && nacl.baseSP === 8, 'NaCl failed');
+
+        const ch4 = V.validateSynthesis([makeCardBySymbol('C', 1), makeCardBySymbol('H', 1), makeCardBySymbol('H', 2), makeCardBySymbol('H', 3), makeCardBySymbol('H', 4)], false);
+        assert(ch4.valid && ch4.compound.formula === 'CH₄' && ch4.baseSP === 8, 'CH4 failed');
+
+        const co2 = V.validateSynthesis([makeCardBySymbol('C', 1), makeCardBySymbol('O', 1), makeCardBySymbol('O', 2)], false);
+        assert(co2.valid && co2.compound.formula === 'CO₂' && co2.baseSP === 16, 'CO2 failed');
+
+        const o2 = V.validateSynthesis([makeCardBySymbol('O', 1), makeCardBySymbol('O', 2)], false);
+        assert(o2.valid && o2.compound.formula === 'O₂' && o2.baseSP === 12, 'O2 diatomic failed');
+
+        const bogus = V.validateSynthesis([makeCardBySymbol('Na', 1), makeCardBySymbol('K', 1)], false);
+        assert(!bogus.valid, 'Na+K should not be valid');
+      });
+
+      // 3. Catalyst synthesis (Catalyst does not count toward point total!)
+      test('Catalyst completes H + O -> H2O (+7 SP; Catalyst adds 0 SP)', () => {
+        const res = V.validateSynthesis([makeCardBySymbol('H', 1), makeCardBySymbol('O', 1)], true);
+        assert(res.valid && res.compound.formula === 'H₂O' && res.baseSP === 7, `Catalyst H+O failed (got ${res.baseSP})`);
+      });
+
+      // 4. Electronegativity Takeover (Fluorine steals 1 H from H2O -> HF, returns O & H to owner)
+      test('EN Takeover: Fluorine replaces O in opponent H2O, steals 1 H -> HF, returns H & O to owner hand', () => {
+        const state = V.createGame({ mode: 'pass_and_play' });
+        const p1 = state.players[0];
+        const p2 = state.players[1];
+        const h1 = makeCardBySymbol('H', 'a');
+        const h2 = makeCardBySymbol('H', 'b');
+        const o1 = makeCardBySymbol('O', 'a');
+        p2.hand = [];
+        p2.field = [{
+          id: 'c_h2o', formula: 'H₂O', name: 'Water', bondType: 'covalent',
+          elements: [h1, h2, o1], baseSP: 8, bonusSP: 0, shield: null, inactive: false, poisonedBy: null, abilityBadges: [],
+        }];
+        const f1 = makeCardBySymbol('F', 'a');
+        p1.hand = [f1];
+        state.phase = 'DEFENSE';
+
+        const moves = V.findENTakeoversForCard(f1, p1.hand, p2.field[0]);
+        const hfMove = moves.find((m) => m.compound.formula === 'HF');
+        assert(Boolean(hfMove), 'Expected HF takeover option');
+
+        const exec = V.executeENTakeover(state, 1, hfMove);
+        assert(exec.ok, exec.error);
+        assert(V.getPlayerSP(p2) === 0, 'Opponent should lose all 8 SP from broken H2O');
+        assert(V.getPlayerSP(p1) === 8, 'Attacker should gain 8 SP from HF');
+        assert(p2.hand.length === 2, `Opponent should get 2 leftover cards back (H & O), got ${p2.hand.length}`);
+        assert(p2.hand.some((c) => c.symbol === 'O') && p2.hand.some((c) => c.symbol === 'H'), 'Returned cards must be H and O');
+      });
+
+      // 5. Fluorine Apex Oxidizer vs Heavy vs Light Noble Gas Shields
+      test('Fluorine pierces Xenon shield (Kr/Xe/Rn) but Helium shield (He/Ne/Ar) remains immune', () => {
+        const fCard = makeCardBySymbol('F', 1);
+        const h2oXe = {
+          id: 'c1', formula: 'H₂O', elements: [makeCardBySymbol('H', 1), makeCardBySymbol('H', 2), makeCardBySymbol('O', 1)],
+          baseSP: 8, shield: makeCardBySymbol('Xe', 1), inactive: false,
+        };
+        const h2oHe = {
+          id: 'c2', formula: 'H₂O', elements: [makeCardBySymbol('H', 3), makeCardBySymbol('H', 4), makeCardBySymbol('O', 2)],
+          baseSP: 8, shield: makeCardBySymbol('He', 1), inactive: false,
+        };
+        const movesXe = V.findENTakeoversForCard(fCard, [fCard], h2oXe);
+        const movesHe = V.findENTakeoversForCard(fCard, [fCard], h2oHe);
+        assert(movesXe.length > 0 && movesXe[0].piercesHeavyShield, 'Fluorine should pierce Xenon');
+        assert(movesHe.length === 0, 'Helium must block Fluorine');
+      });
+
+      // 6. Special Abilities: Salt Cure + Gallium Liquid Embrittlement + Lead Radiation Shielding
+      test('Sodium Salt Cure grants +1 SP and draws 1 card on NaCl synthesis', () => {
+        const state = V.createGame({ mode: 'pass_and_play' });
+        const p1 = state.players[0];
+        const na = makeCardBySymbol('Na', 1);
+        const cl = makeCardBySymbol('Cl', 1);
+        p1.hand = [na, cl];
+        const res = V.synthesizeCompound(state, [na.id, cl.id]);
+        assert(res.ok, res.error);
+        assert(V.getPlayerSP(p1) === 9, `Expected 9 SP (8 + 1 Salt Cure), got ${V.getPlayerSP(p1)}`);
+        assert(p1.hand.length === 1, 'Expected 1 card drawn from Salt Cure');
+      });
+
+      test('Gallium Liquid Embrittlement shatters opponent AlCl3 and returns Al to their hand', () => {
+        const state = V.createGame({ mode: 'pass_and_play' });
+        const p1 = state.players[0];
+        const p2 = state.players[1];
+        p2.hand = [];
+        p2.field = [{
+          id: 'c_alcl3', formula: 'AlCl₃', name: 'Aluminum Chloride',
+          elements: [makeCardBySymbol('Al', 1), makeCardBySymbol('Cl', 1), makeCardBySymbol('Cl', 2), makeCardBySymbol('Cl', 3)],
+          baseSP: 24, bonusSP: 0, shield: null, inactive: false, poisonedBy: null, abilityBadges: [],
+        }];
+        const ga = makeCardBySymbol('Ga', 1);
+        const n = makeCardBySymbol('N', 1);
+        p1.hand = [ga, n];
+        const res = V.synthesizeCompound(state, [ga.id, n.id]);
+        assert(res.ok, res.error);
+        assert(p2.field.length === 0 && V.getPlayerSP(p2) === 0, 'AlCl3 should be shattered');
+        assert(p2.hand.length === 1 && p2.hand[0].symbol === 'Al', 'Aluminum should return to opponent hand');
+      });
+
+      test('Resonance Stabilizer absorbs Acid Rain and saves compound SP', () => {
+        const state = V.createGame({ mode: 'pass_and_play' });
+        const p1 = state.players[0];
+        const p2 = state.players[1];
+        const acid = makeEffectCard('ACID_RAIN', 1);
+        const resCard = makeEffectCard('RESONANCE_STABILIZER', 1);
+        p1.hand = [acid];
+        p2.field = [{
+          id: 'c_co2', formula: 'CO₂', name: 'Carbon Dioxide',
+          elements: [makeCardBySymbol('C', 1), makeCardBySymbol('O', 1), makeCardBySymbol('O', 2)],
+          baseSP: 16, bonusSP: 0, shield: null, resonanceCard: resCard, inactive: false, poisonedBy: null, abilityBadges: [],
+        }];
+        state.phase = 'DEFENSE';
+        const r = V.playEventOrInstance(state, acid.id, { targetCompoundId: 'c_co2' });
+        assert(r.ok, r.error);
+        assert(p2.field.length === 1 && V.getPlayerSP(p2) === 16, 'CO2 should survive Acid Rain');
+        assert(p2.field[0].resonanceCard === null, 'Resonance Stabilizer should be consumed');
+      });
+
+      // 7. Full AI vs AI stress simulation (10 complete matches)
+      test('10 full AI-vs-AI games complete cleanly with zero errors and valid 25+ SP winners', () => {
+        let finished = 0;
+        for (let g = 0; g < 10; g++) {
+          const state = V.createGame({ mode: 'vs_ai' });
+          state.players[0].isAI = true;
+          state.players[1].isAI = true;
+          let steps = 0;
+          while (state.phase !== 'GAME_OVER' && steps < 400) {
+            V.runAIStep(state);
+            steps++;
+          }
+          assert(state.phase === 'GAME_OVER', `Game ${g + 1} did not finish within 400 steps`);
+          const winSP = V.getPlayerSP(state.players[state.winnerIndex]);
+          assert(winSP >= 25, `Winner SP was ${winSP} < 25`);
+          finished++;
+        }
+        assert(finished === 10, 'All 10 games must complete');
+      });
+
+      // Render report
+      const passed = results.filter((r) => r.ok).length;
+      const summary = document.getElementById('summary');
+      summary.className = `summary ${passed === results.length ? 'pass-bg' : 'fail-bg'}`;
+      summary.textContent = `${passed} / ${results.length} tests passed`;
+
+      const container = document.getElementById('results');
+      container.innerHTML = results.map((r) => `
+        <div class="row ${r.ok ? '' : 'fail'}">
+          <strong>${r.ok ? '✓ PASS' : '✕ FAIL'}:</strong> ${r.name}
+          ${r.err ? `<div style="margin-top:4px;opacity:.9">${r.err}</div>` : ''}
+        </div>
+      `).join('');
+    })();
+  </script>
+</body>
+</html>

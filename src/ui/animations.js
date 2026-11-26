@@ -35,7 +35,12 @@
 
   function setAnimationsEnabled(enabled) {
     animationsEnabled = Boolean(enabled);
-    document.body.classList.toggle('fx-reduced', !animationsEnabled);
+    if (typeof document !== 'undefined' && document.body) {
+      document.body.classList.toggle('fx-reduced', !animationsEnabled);
+    }
+    if (V.CharacterRig && typeof V.CharacterRig.syncAllRigsMode === 'function') {
+      V.CharacterRig.syncAllRigsMode();
+    }
   }
 
   function isAnimationsEnabled() {
@@ -334,6 +339,12 @@
     const m1 = getProfileMeta(p1, 0, mode, storyMeta);
     const m2 = getProfileMeta(p2, 1, mode, storyMeta);
 
+    const oppAnimatedId =
+      (storyMeta && storyMeta.animatedPortraitId) ||
+      (V.CharacterRegistry && storyMeta && V.CharacterRegistry.resolveCharacterId(storyMeta)) ||
+      null;
+    const useOppAnimated = Boolean(oppAnimatedId && V.CharacterRig);
+
     root.innerHTML = `
       <div class="intro-stage" id="intro-stage">
         <div class="intro-card intro-left" style="--prof-accent:${m1.accent};--prof-glow:${m1.glow}">
@@ -355,8 +366,10 @@
 
         <div class="intro-card intro-right" style="--prof-accent:${m2.accent};--prof-glow:${m2.glow}">
           <span class="intro-tag">${m2.badge}</span>
-          <div class="intro-avatar-wrap">
-            ${renderPortraitSVG(m2.key, 'intro-avatar')}
+          <div class="intro-avatar-wrap ${useOppAnimated ? 'has-animated-portrait' : ''}" id="intro-opp-avatar-wrap">
+            ${useOppAnimated
+              ? '<div id="intro-animated-portrait"></div>'
+              : renderPortraitSVG(m2.key, 'intro-avatar')}
           </div>
           <h2 class="intro-name">${p2.name}</h2>
           <div class="intro-title">${m2.title}</div>
@@ -370,6 +383,19 @@
       </div>
     `;
 
+    let introRig = null;
+    if (useOppAnimated) {
+      const mountEl = document.getElementById('intro-animated-portrait');
+      if (mountEl) {
+        introRig = V.CharacterRig.mount(mountEl, {
+          characterId: oppAnimatedId,
+          size: 'intro',
+          expression: 'neutral',
+          autoplayTransition: true,
+        });
+      }
+    }
+
     root.classList.remove('hidden', 'intro-exit');
     if (V.Sound) V.Sound.playIntroClash();
 
@@ -377,6 +403,10 @@
     function finishIntro() {
       if (finished) return;
       finished = true;
+      if (introRig) {
+        introRig.destroy();
+        introRig = null;
+      }
       if (introTimeout) {
         clearTimeout(introTimeout);
         introTimeout = null;

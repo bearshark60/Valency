@@ -3350,3 +3350,47 @@ body {
   margin-top: 3px;
   font-style: italic;
 }
+
+
+/* ===== STAGE 3A: RESEARCH ARCHIVE COMPETENCY RECORD & FINAL LICENSURE CERTIFICATE ===== */
+.archive-comp-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.licensure-cert-card {
+  background: linear-gradient(145deg, rgba(13, 148, 136, 0.24), rgba(79, 70, 229, 0.2), rgba(15, 23, 42, 0.96));
+  border: 1.5px solid rgba(94, 234, 212, 0.65);
+  border-radius: 13px;
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 10px 28px rgba(13, 148, 136, 0.2);
+}
+
+
+/* ===== STAGE 3B: ELEMENTAL FRONTIER UI ===== */
+.menu-cta-frontier {
+  background: linear-gradient(135deg, #0e7490 0%, #0f766e 52%, #1d4ed8 100%);
+  border-color: #67e8f9;
+  box-shadow: 0 10px 26px rgba(14, 116, 144, 0.34);
+}
+
+.menu-cta-frontier:hover {
+  box-shadow: 0 14px 34px rgba(56, 189, 248, 0.46);
+  border-color: #a5f3fc;
+}
+
+.frontier-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px;
+}
+
+.frontier-tab-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

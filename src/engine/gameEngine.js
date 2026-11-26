@@ -18,9 +18,11 @@
     return copy;
   }
 
-  function createPlayer(id, name, isAI) {
+  function createPlayer(id, name, isAI, participantMeta) {
+    const meta = participantMeta || {};
     return {
       id,
+      entityId: meta.entityId || `participant_${id}`,
       name,
       isAI: Boolean(isAI),
       hand: [],
@@ -30,6 +32,7 @@
       pendingDecayDiscard: 0, // Francium next-turn discard penalty
       bufferProtected: false, // Buffer Solution: protects entire field from Red Events until next turn
       chloraminePenalty: false, // Chlorine Chloramine Hazard: -50% SP on next synthesis
+      equippedScientist: meta.equippedScientist ? JSON.parse(JSON.stringify(meta.equippedScientist)) : null,
     };
   }
 
@@ -181,14 +184,19 @@
   function createGame(options) {
     const opts = options || {};
     const mode = opts.mode || 'vs_ai'; // 'vs_ai' | 'pass_and_play'
-    const p1Name = opts.p1Name || 'You';
-    const p2Name = opts.p2Name || (mode === 'vs_ai' ? 'Dr. Mendeleev (AI)' : 'Player 2');
+    const p1Meta = opts.participants && opts.participants[0] ? opts.participants[0] : {};
+    const p2Meta = opts.participants && opts.participants[1] ? opts.participants[1] : {};
+    const p1Name = p1Meta.name || opts.p1Name || 'You';
+    const p2Name = p2Meta.name || opts.p2Name || (mode === 'vs_ai' ? 'Dr. Mendeleev (AI)' : 'Player 2');
     const rng = opts.rng || Math.random;
 
-    const fullDeck = shuffle(V.buildFullDeck(), rng);
+    const baseDeck = Array.isArray(opts.customDeckCards) && opts.customDeckCards.length >= 14
+      ? opts.customDeckCards.map((c) => ({ ...c }))
+      : V.buildFullDeck();
+    const fullDeck = shuffle(baseDeck, rng);
     const players = [
-      createPlayer(0, p1Name, false),
-      createPlayer(1, p2Name, mode === 'vs_ai'),
+      createPlayer(0, p1Name, Boolean(p1Meta.isAI), p1Meta),
+      createPlayer(1, p2Name, p2Meta.isAI !== undefined ? Boolean(p2Meta.isAI) : mode === 'vs_ai', p2Meta),
     ];
 
     const state = {
@@ -203,6 +211,7 @@
       discardPile: [],
       pendingPrompt: null, // interactive modal prompt for human (e.g., discard pick, distillation pick, gallium/polonium target)
       winnerIndex: null,
+      encounterMeta: opts.encounterMeta || null,
       log: [],
       recentEvents: [],
       _compoundSeq: 0,
@@ -599,6 +608,31 @@
 
     // Element special abilities
     triggerSynthesisAbilities(state, active, opponent, comp);
+
+    // Equipped Frontier Scientist Passive Specialty (runs ONLY when equippedScientist is present; zero SP alteration)
+    if (
+      active.equippedScientist &&
+      active.equippedScientist.passiveAbility &&
+      active.equippedScientist.passiveTriggersRemaining > 0
+    ) {
+      const pass = active.equippedScientist.passiveAbility;
+      const syms = new Set(comp.elements.map((e) => e.symbol));
+      if (pass.id === 'pass_lavoisier_conservation' && !comp.catalyzed && (syms.has('O') || syms.has('H'))) {
+        active.equippedScientist.passiveTriggersRemaining -= 1;
+        const drawn = drawCards(state, active, 1, 'scientist_passive');
+        pushLog(
+          state,
+          `SCIENTIST PASSIVE (${pass.name})! ${active.equippedScientist.name} rewarded clean O/H stoichiometry — ${active.name} drew ${drawn.length} card!`,
+          'ability',
+          {
+            type: 'SCIENTIST_PASSIVE',
+            playerId: active.id,
+            scientistId: active.equippedScientist.scientistId,
+            abilityId: pass.id,
+          }
+        );
+      }
+    }
 
     if (checkWinner(state)) {
       return { ok: true, compound: comp };
@@ -1331,6 +1365,81 @@
     return { ok: true };
   }
 
+  /**
+   * Canonical Battle Action: Activate equipped Frontier Scientist's Active Ability.
+   * Strictly obeys phase gates, usage limits, and existing engine resolution (no second combat engine).
+   */
+  function activateScientistAbility(state, payload) {
+    if (state.phase === 'GAME_OVER' || state.pendingPrompt) {
+      return { ok: false, error: 'Cannot activate Scientist ability right now.' };
+    }
+    const active = getActivePlayer(state);
+    const sci = active && active.equippedScientist;
+    if (!sci || !sci.activeAbility) {
+      return { ok: false, error: 'No equipped Scientist active ability available.' };
+    }
+    if ((sci.activeUsesRemaining || 0) <= 0) {
+      return { ok: false, error: `${sci.activeAbility.name} has already been used this match.` };
+    }
+    const requiredPhase = sci.activeAbility.phase || 'DEFENSE';
+    if (state.phase !== requiredPhase) {
+      return { ok: false, error: `${sci.activeAbility.name} can only be activated during Phase 3: Defense & Events.` };
+    }
+
+    const info = payload || {};
+    if (sci.activeAbility.id === 'act_lavoisier_reclaim') {
+      const discardElements = state.discardPile.filter((c) => c.kind === 'element' || c.kind === 'noble_gas');
+      if (discardElements.length === 0) {
+        return { ok: false, error: 'There are no Element cards in the Discard Pile to reclaim.' };
+      }
+      sci.activeUsesRemaining -= 1;
+
+      if (info.discardCardId) {
+        const idx = state.discardPile.findIndex((c) => c.id === info.discardCardId);
+        if (idx === -1) {
+          sci.activeUsesRemaining += 1;
+          return { ok: false, error: 'Selected card is not in the Discard Pile.' };
+        }
+        const [reclaimed] = state.discardPile.splice(idx, 1);
+        active.hand.push(reclaimed);
+        pushLog(
+          state,
+          `SCIENTIST ACTIVE (${sci.activeAbility.name})! ${active.name} reclaimed ${reclaimed.name} (${reclaimed.symbol}) from the Discard Pile!`,
+          'ability',
+          {
+            type: 'SCIENTIST_ACTIVE',
+            playerId: active.id,
+            scientistId: sci.scientistId,
+            abilityId: sci.activeAbility.id,
+            symbol: reclaimed.symbol,
+          }
+        );
+        return { ok: true, reclaimed };
+      }
+
+      // Human interactive picker reusing canonical DISTILLATION_PICK modal flow!
+      state.pendingPrompt = {
+        type: 'DISTILLATION_PICK',
+        playerId: active.id,
+        title: `${sci.activeAbility.name} — Choose 1 Element from the Discard Pile`,
+      };
+      pushLog(
+        state,
+        `SCIENTIST ACTIVE (${sci.activeAbility.name})! ${active.name} initiated quantitative reclamation from the Discard Pile.`,
+        'ability',
+        {
+          type: 'SCIENTIST_ACTIVE',
+          playerId: active.id,
+          scientistId: sci.scientistId,
+          abilityId: sci.activeAbility.id,
+        }
+      );
+      return { ok: true, pendingPrompt: true };
+    }
+
+    return { ok: false, error: `Unsupported Scientist active ability: ${sci.activeAbility.id}` };
+  }
+
   V.WIN_SP = WIN_SP;
   V.createGame = createGame;
   V.getActivePlayer = getActivePlayer;
@@ -1349,4 +1458,5 @@
   V.concedeMatch = concedeMatch;
   V.resolvePrompt = resolvePrompt;
   V.endTurn = endTurn;
+  V.activateScientistAbility = activateScientistAbility;
 })(typeof window !== 'undefined' ? window : globalThis);

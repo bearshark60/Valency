@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 896 1200" width="896" height="1200" data-character-id="sci_men_002_institute" data-ai-family="INSTITUTE" data-generation="INSTITUTE_HOLOGRAM" data-art-tier="PRODUCTION_PAINTERLY">
+  <title>SCI-MEN-002-INST — Institute AI Hologram: Dmitri Mendeleev (Production Painterly 16-Layer Rig)</title>
+  <defs>
+    <pattern id="menI_scanlines" width="8" height="8" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="8" y2="0" stroke="#e0f2fe" stroke-opacity="0.072" stroke-width="1" />
+    </pattern>
+
+    <!-- Exact Symmetrical Anatomical Eye Aperture Clips (Preserve Real Painted Upper Lash Line!) -->
+    <clipPath id="menI_clipEyeLeft">
+      <path d="M343 393 C358 383, 396 383, 411 393 C396 402, 358 402, 343 393 Z" />
+    </clipPath>
+    <clipPath id="menI_clipEyeRight">
+      <path d="M485 393 C500 383, 538 383, 553 393 C538 402, 500 402, 485 393 Z" />
+    </clipPath>
+    <linearGradient id="menI_eyeTopShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#142b3d" stop-opacity="0.44" />
+      <stop offset="44%" stop-color="#1e3c52" stop-opacity="0.14" />
+      <stop offset="100%" stop-color="#1e3c52" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- ==================== LAYER 1: ARCHIVAL MUSEUM BACKGROUND & PERIODIC CALIBRATION RINGS ==================== -->
+  <g id="layer_bg" data-layer="layer_bg">
+    <image href="assets/characters/sci_men_002_institute/layers/01_background.png" x="0" y="0" width="896" height="1200" preserveAspectRatio="none" />
+    <g stroke="#7dd3fc" fill="none" opacity="0.26">
+      <circle cx="448" cy="412" r="356" stroke-width="1.4" />
+      <circle cx="448" cy="412" r="316" stroke-width="1" stroke-dasharray="10 6" />
+      <circle cx="448" cy="412" r="268" stroke-width="0.9" opacity="0.6" />
+      <!-- Symmetrical Periodic Column Hairlines & Group Ticks -->
+      <line x1="180" y1="30" x2="180" y2="740" stroke-width="1.1" opacity="0.72" />
+      <line x1="716" y1="30" x2="716" y2="740" stroke-width="1.1" opacity="0.72" />
+      <line x1="180" y1="160" x2="196" y2="160" stroke-width="1.1" />
+      <line x1="180" y1="290" x2="196" y2="290" stroke-width="1.1" />
+      <line x1="180" y1="420" x2="196" y2="420" stroke-width="1.1" />
+      <line x1="180" y1="550" x2="196" y2="550" stroke-width="1.1" />
+      <line x1="700" y1="160" x2="716" y2="160" stroke-width="1.1" />
+      <line x1="700" y1="290" x2="716" y2="290" stroke-width="1.1" />
+      <line x1="700" y1="420" x2="716" y2="420" stroke-width="1.1" />
+      <line x1="700" y1="550" x2="716" y2="550" stroke-width="1.1" />
+    </g>
+  </g>
+
+  <!-- ==================== RIG ROOT: TORSO / BREATHING GROUP ==================== -->
+  <g id="rig_torso_group" data-rig="torso">
+    <g id="layer_hair_rear" data-layer="layer_hair_rear">
+      <image href="assets/characters/sci_men_002_institute/layers/03_hair_rear.png" x="0" y="0" width="896" height="1200" />
+    </g>
+    <g id="layer_clothing_rear" data-layer="layer_clothing_rear"></g>
+    <g id="layer_neck" data-layer="layer_neck"></g>
+    <g id="layer_clothing_front" data-layer="layer_clothing_front">
+      <image href="assets/characters/sci_men_002_institute/layers/02_body_clothing.png" x="0" y="0" width="896" height="1200" />
+    </g>
+
+    <!-- ==================== RIG HEAD GROUP (SERENE SYMMETRICAL MOTION) ==================== -->
+    <g id="rig_head_group" data-rig="head">
+      <g id="layer_head_base" data-layer="layer_head_base">
+        <image href="assets/characters/sci_men_002_institute/layers/04_face_head.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_jaw_lower" data-layer="layer_jaw_lower">
+        <image href="assets/characters/sci_men_002_institute/layers/12_jaw_lower.png" x="0" y="0" width="896" height="1200" />
+      </g>
+
+      <!-- Left & Right Symmetrical Painted Eyes -->
+      <g id="layer_eye_left" data-layer="layer_eye_left">
+        <g clip-path="url(#menI_clipEyeLeft)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_men_002_institute/layers/05_eye_left_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="341" y="381" width="72" height="21" fill="url(#menI_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_men_002_institute/layers/07_lid_left_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="337" y="402" width="80" height="17" fill="#c7d5de" opacity="0.9" />
+          </g>
+        </g>
+      </g>
+
+      <g id="layer_eye_right" data-layer="layer_eye_right">
+        <g clip-path="url(#menI_clipEyeRight)">
+          <g data-part="sclera"></g>
+          <g data-part="iris">
+            <image href="assets/characters/sci_men_002_institute/layers/06_eye_right_iris.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <rect x="483" y="381" width="72" height="21" fill="url(#menI_eyeTopShadow)" />
+          <g data-part="lid_upper">
+            <image href="assets/characters/sci_men_002_institute/layers/08_lid_right_upper.png" x="0" y="0" width="896" height="1200" />
+          </g>
+          <g data-part="lid_lower">
+            <rect x="479" y="402" width="80" height="17" fill="#c7d5de" opacity="0.9" />
+          </g>
+        </g>
+      </g>
+
+      <g id="layer_brow_left" data-layer="layer_brow_left">
+        <image href="assets/characters/sci_men_002_institute/layers/09_brow_left.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_brow_right" data-layer="layer_brow_right">
+        <image href="assets/characters/sci_men_002_institute/layers/10_brow_right.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_nose_detail" data-layer="layer_nose_detail">
+        <ellipse cx="448" cy="436" rx="6" ry="30" fill="#f0f9ff" opacity="0.07" />
+      </g>
+      <g id="layer_mouth" data-layer="layer_mouth">
+        <ellipse data-part="mouth_cavity" cx="448" cy="553" rx="28" ry="5.5" fill="#18324a" opacity="0" />
+        <image href="assets/characters/sci_men_002_institute/layers/11_mouth.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <g id="layer_hair_front" data-layer="layer_hair_front">
+        <image href="assets/characters/sci_men_002_institute/layers/13_hair_front.png" x="0" y="0" width="896" height="1200" />
+      </g>
+      <!-- Strictly Zero Frontier Degradation / Crystalline Seams -->
+      <g id="layer_mech_crystal" data-layer="layer_mech_crystal" opacity="0"></g>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 16: CLEAN VOLUMETRIC MUSEUM HOLOGRAM SCANLINES ==================== -->
+  <g id="layer_fx_reconstruction" data-layer="layer_fx_reconstruction" opacity="0.42">
+    <rect x="0" y="0" width="896" height="1200" fill="url(#menI_scanlines)" />
+  </g>
+</svg>

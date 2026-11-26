@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="chemist-avatar-svg portrait-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <radialGradient id="avBgM" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#3b0764"/>
+              <stop offset="100%" stop-color="#0f172a"/>
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="56" fill="url(#avBgM)" stroke="#a855f7" stroke-width="3"/>
+          <!-- Orbiting periodic halo -->
+          <ellipse cx="60" cy="56" rx="46" ry="18" fill="none" stroke="#c084fc" stroke-width="1.6" stroke-dasharray="6 4" transform="rotate(-18 60 56)" opacity="0.7"/>
+          <!-- Coat & collar -->
+          <path d="M22 108 C24 84 40 78 60 78 C80 78 96 84 98 108 Z" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.8"/>
+          <path d="M46 78 L60 98 L74 78" fill="#e2e8f0"/>
+          <!-- Iconic silver hair & grand beard -->
+          <path d="M32 54 C30 26 44 18 60 18 C76 18 90 26 88 54 C92 66 86 80 76 86 C68 92 52 92 44 86 C34 80 28 66 32 54 Z" fill="#cbd5e1"/>
+          <!-- Face -->
+          <ellipse cx="60" cy="50" rx="19" ry="20" fill="#fde6d2"/>
+          <!-- Sweeping silver mustache & full beard -->
+          <path d="M40 58 C44 52 54 54 60 58 C66 54 76 52 80 58 C82 74 74 88 60 90 C46 88 38 74 40 58 Z" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+          <path d="M45 58 Q60 53 75 58" fill="none" stroke="#cbd5e1" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- Glowing violet spectacles -->
+          <circle cx="51" cy="48" r="7.5" fill="rgba(168,85,247,0.28)" stroke="#e9d5ff" stroke-width="2.2"/>
+          <circle cx="69" cy="48" r="7.5" fill="rgba(168,85,247,0.28)" stroke="#e9d5ff" stroke-width="2.2"/>
+          <line x1="58.5" y1="48" x2="61.5" y2="48" stroke="#e9d5ff" stroke-width="2"/>
+          <circle cx="51" cy="48" r="2.2" fill="#f5d0fe"/>
+          <circle cx="69" cy="48" r="2.2" fill="#f5d0fe"/>
+          <!-- Orbit electron -->
+          <circle cx="96" cy="36" r="4" fill="#e879f9" stroke="#ffffff" stroke-width="1.2"/>
+        </svg>

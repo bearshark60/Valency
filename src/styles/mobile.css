@@ -169,9 +169,16 @@ body.valency-mobile .mobile-turn-banner {
   padding: 4px 8px;
   gap: 5px;
   flex-wrap: nowrap;
-  overflow: hidden;
+  overflow: visible;
   white-space: nowrap;
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+body.valency-mobile .mobile-turn-who {
+  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   min-width: 0;
 }
 
@@ -179,6 +186,38 @@ body.valency-mobile .mobile-turn-banner .phase-badge {
   font-size: 9.5px;
   padding: 2px 6px;
   flex-shrink: 0;
+}
+
+@media (max-width: 400px) {
+  body.valency-mobile .mobile-topbar {
+    gap: 5px;
+    padding-left: max(6px, env(safe-area-inset-left));
+    padding-right: max(6px, env(safe-area-inset-right));
+  }
+
+  .mobile-top-left,
+  .mobile-top-right {
+    gap: 4px;
+  }
+
+  .mobile-icon-btn,
+  .mobile-pill-btn {
+    min-width: 34px;
+    min-height: 36px;
+    padding: 5px 7px;
+    font-size: 13px;
+  }
+
+  body.valency-mobile .mobile-turn-banner {
+    font-size: 10.5px;
+    padding: 4px 7px;
+    gap: 4px;
+  }
+
+  body.valency-mobile .mobile-turn-banner .phase-badge {
+    font-size: 9px;
+    padding: 1.5px 5px;
+  }
 }
 
 /* Main Layout: Single Column Full-Width Table */
@@ -206,27 +245,42 @@ body.valency-mobile .player-zone {
 }
 
 body.valency-mobile .zone-header {
-  gap: 6px;
+  gap: 5px 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 body.valency-mobile .player-identity {
-  gap: 7px;
-  flex: 1;
+  gap: 8px;
+  flex: 1 1 100%;
   min-width: 0;
+  flex-wrap: nowrap;
+}
+
+body.valency-mobile .player-identity > div {
+  min-width: 0;
+  flex: 1;
 }
 
 body.valency-mobile .mini-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 body.valency-mobile .player-name {
   font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 body.valency-mobile .player-subrole {
   font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.valency-mobile .opponent-backs {
@@ -419,8 +473,47 @@ body.valency-mobile .vcard-effect-box {
 
 /* Large Inspector Card & Showcase Cards fit iPhone screens cleanly */
 body.valency-mobile .vcard-large {
-  width: min(252px, 78vw);
+  width: min(256px, calc(100vw - 56px));
   min-height: 344px;
+}
+
+body.valency-mobile .vcard-large .octet-dot {
+  flex-shrink: 0;
+}
+
+@media (max-width: 380px) {
+  body.valency-mobile .vcard-large {
+    width: min(244px, calc(100vw - 52px));
+    min-height: auto;
+    padding: 10px;
+  }
+
+  body.valency-mobile .vcard-large .vcard-split {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  body.valency-mobile .vcard-large .vcard-stats-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    align-items: center;
+  }
+
+  body.valency-mobile .vcard-large .vcard-bond-row {
+    grid-column: span 2;
+  }
+
+  body.valency-mobile .vcard-large .octet-bar {
+    grid-column: span 2;
+    justify-content: flex-start;
+    gap: 5px;
+  }
+
+  body.valency-mobile .vcard-large .octet-dot {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 body.valency-mobile .showcase-panel {
